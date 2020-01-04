@@ -12,5 +12,11 @@
 4. Replace the kernel.img file on your Raspberry Pi SD card with the new one you just generated. (backup the old one if desired)
 5. Plug the SD card back into the Pi and see what you messed up.
 6. Get sad.
-7. fix the problem.
+7. Fix the problem.
 8. Goto step 3
+
+### Some notes about the code structure:
+- main.c is a sketchpad for whatever peripherals I'm working on.
+- Code files prefixed with "PSP" are part of the Processor Support Package. These files deal with registers and things close to the processor.
+- Code files prefixed with "BSB" are part of the Board Support Package. These files support things like communication protocols, ADC/DAC stuff, etc.
+- At a minimum, most PSP/BSP .h files will define register addresses and set up pointers to those registers for reading/writing to registers directly.
