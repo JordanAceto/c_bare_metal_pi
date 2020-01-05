@@ -25,7 +25,7 @@ void BSP_PWM_Clock_Init(BSP_PWM_Clock_Source_t clock_source, uint32_t divider)
     // set the divider, left shift of 12 pushes the divider setting into the integer part of the divider register
     BSP_CM_PWMDIV_R = CM_PWMCTL_PASSWD | (divider << 12);
 
-    // use internal oscillator clock source
+    // set the clock source
     BSP_CM_PWMCTL_R = CM_PWMCTL_PASSWD | clock_source;
 
     // request a clock start (datasheet says not to change the clock source and assert enable at the same time)
