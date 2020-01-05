@@ -2,13 +2,14 @@
 #define BPS_PWM_H_INCLUDED
 
 #include "Fixed_Width_Ints.h"
+#include "PSP_REGS.h"
 
 /*------------------------------------------------------------------------------------------------
     Public BSP_PWM Defines
  -------------------------------------------------------------------------------------------------*/
 
 // PWM Register Addresses
-#define BSP_PWM_BASE_ADDRESS (0x3F20C000u)
+#define BSP_PWM_BASE_ADDRESS (PSP_REGS_PWM_BASE_ADDRESS)
 
 #define BSP_PWM_CTL_A        (BSP_PWM_BASE_ADDRESS | 0x00000000u)      // PWM control register address
 #define BSP_PWM_STA_A        (BSP_PWM_BASE_ADDRESS | 0x00000004u)      // PWM status register address

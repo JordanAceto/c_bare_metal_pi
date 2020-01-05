@@ -3,13 +3,14 @@
 #define PSP_GPIO_H_INCLUDED
 
 #include "Fixed_Width_Ints.h"
+#include "PSP_REGS.h"
 
 /*-----------------------------------------------------------------------------------------------
     Public PSP_GPIO Defines
  -------------------------------------------------------------------------------------------------*/
 
 // Register Addresses
-#define GPIO_BASE_ADDRESS    (0x3F200000u)
+#define GPIO_BASE_ADDRESS    (PSP_REGS_GPIO_BASE_ADDRESS)
 
 #define PSP_GPIO_GPFSEL0_A   (GPIO_BASE_ADDRESS | 0x00000000u)  // GPIO Function Select 0 address
 #define PSP_GPIO_GPFSEL1_A   (GPIO_BASE_ADDRESS | 0x00000004u)  // GPIO Function Select 1 address

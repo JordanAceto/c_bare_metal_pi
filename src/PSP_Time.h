@@ -3,13 +3,14 @@
 #define PSP_TIME_H_INCLUDED
 
 #include "Fixed_Width_Ints.h"
+#include "PSP_REGS.h"
 
 /*-----------------------------------------------------------------------------------------------
     Public PSP_Time Defines
  -------------------------------------------------------------------------------------------------*/
 
 // Register Addresses
-#define PSP_Time_BASE_ADDRESS (0x3F003000u)                            // base address of System Timer Register
+#define PSP_Time_BASE_ADDRESS (PSP_REGS_SYSCLK_BASE_ADDRESS)           // base address of System Timer Register
 
 #define PSP_Time_CS_A         (PSP_Time_BASE_ADDRESS | 0x00000000u)    // System Timer Control/Status address
 #define PSP_Time_CLO_A        (PSP_Time_BASE_ADDRESS | 0x00000004u)    // System Timer Counter Lower 32 bits address
