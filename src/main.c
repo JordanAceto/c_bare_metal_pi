@@ -2,6 +2,7 @@
 #include "PSP_GPIO.h"
 #include "PSP_Time.h"
 #include "BSP_PWM.h"
+#include "BSP_SPI_0.h"
 
 #define LED_PIN 17u
 #define SWITCH_PIN 21u
@@ -16,6 +17,9 @@ int main()
     BSP_PWM_Clock_Init(BSP_PWM_Clock_Source_OSCILLATOR, PWM_CLOCK_DIVIDER);
     BSP_PWM_Channel_Start(BSP_PWM_Channel_1, BSP_PWM_MARK_SPACE_MODE, BSP_PWM_RANGE_10_BITS);
     BSP_PWM_Ch1_Set_GPIO12_To_PWM_Mode();
+
+    BSP_SPI0_Start();
+    BSP_SPI0_Set_Clock_Divider(BSP_SPI0_Clock_Divider_1024);
 
     uint32_t pwm_val = 128;
 
@@ -33,6 +37,12 @@ int main()
             BSP_PWM_Ch1_Write(pwm_val);
             pwm_val++;
             pwm_val %= BSP_PWM_RANGE_10_BITS;
+            
+            BSP_SPI0_Transfer_Byte(0xBEu);
+            BSP_SPI0_Transfer_Byte(0xEFu);
+
+            BSP_SPI0_Transfer_Byte(0xF0u);
+            BSP_SPI0_Transfer_Byte(0x0Du);
         }
     }
 
