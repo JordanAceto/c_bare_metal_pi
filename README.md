@@ -6,13 +6,13 @@
 
 ### How to use this repo:
 
-1. Clone a local copy on you machine.
+1. Clone a local copy on your machine.
 2. Get your toolchain set up, see here: https://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/downloads.html#gnu
 3. Build the kernel.img file by using the **make** command.
 4. Replace the kernel.img file on your Raspberry Pi SD card with the new one you just generated. (backup the old one if desired)
 5. Plug the SD card back into the Pi and see what you messed up.
 6. Get sad.
-7. Fix the problem.
+7. Rage when you realize you had a (!) where you should have had a (~), fix it.
 8. Goto step 3
 
 ### Some notes about the code structure:
