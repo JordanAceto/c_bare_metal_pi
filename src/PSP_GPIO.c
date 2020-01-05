@@ -49,22 +49,22 @@ void PSP_GPIO_Set_Pin_Mode(uint32_t pin_num, uint32_t pin_mode)
     else
     {
         // start at GPFSEL0, we'll move into the correct GPFSEL register by adding an offset
-        volatile uint32_t * GPFSEL_n_Reg = ((volatile uint32_t *)PSP_GPIO_GPFSEL0_A);
+        uint32_t GPFSEL_n_Addr = PSP_GPIO_GPFSEL0_A;
         
         // the offset is which GPFSEL register we need to move into
         const uint32_t GPFSEL_OFFSET = pin_num / NUM_PINS_PER_GPFSEL_REG;
 
-        // add the offset to move to the correct GPSFSEL register for this pin
-        GPFSEL_n_Reg += GPFSEL_OFFSET;
+        // add the offset to move to the correct GPSFSEL register for this pin ( << 2 because next register is 4 away)
+        GPFSEL_n_Addr += (GPFSEL_OFFSET << 2);
 
         // each pin gets three bits in its GPFSEL register which set its mode
         const uint32_t PIN_POSITION = (pin_num % NUM_PINS_PER_GPFSEL_REG) * NUM_BITS_USED_IN_PINMODE;
         
         // clear the 3 bits that set the old pin mode in GPFSELn
-        (*GPFSEL_n_Reg) &= !(0b111 << PIN_POSITION);
+        (*((volatile uint32_t *)GPFSEL_n_Addr)) &= ~(0b111 << PIN_POSITION);
 
         // set the 3 bits in the correct GPFSEL register to the new pin mode
-        (*GPFSEL_n_Reg) |= (pin_mode << PIN_POSITION);
+        (*((volatile uint32_t *)GPFSEL_n_Addr)) |= (pin_mode << PIN_POSITION);
     }
 }
 
