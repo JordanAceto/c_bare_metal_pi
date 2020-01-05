@@ -126,7 +126,7 @@ void PSP_GPIO_Write_Pin(uint32_t pin_num, uint32_t value)
         // if the pin is in the second batch of SET/CLR register, increment the address to SET1/CLR1
         if (pin_num > HIGHEST_BIT_POSITION_IN_A_REGISTER)
         {
-            ++GPIO_SET_OR_CLR_ADDR;
+            GPIO_SET_OR_CLR_ADDR += 4; // next register is 4 bytes away
         }
 
         // find the position of the bit in the SET/CLR register that controls the pin
