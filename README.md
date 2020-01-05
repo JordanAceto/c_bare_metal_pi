@@ -15,6 +15,14 @@
 7. Rage when you realize you had a (!) where you should have had a (~), fix it.
 8. Goto step 3
 
+### These are the files that need to be on your SD card for it to boot:
+- bootcode.bin
+- fixup.dat
+- start.elf
+- kernel.img (this is the one that is generated from compiling your code)
+
+### The three required files (besides kernel.img) can be found here: https://github.com/raspberrypi/firmware/tree/master/boot
+
 ### Some notes about the code structure:
 - main.c is a sketchpad for whatever peripherals I'm working on.
 - Code files prefixed with "PSP" are part of the Processor Support Package. These files deal with registers and things close to the processor.
