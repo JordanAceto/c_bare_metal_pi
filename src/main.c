@@ -6,17 +6,18 @@
 #define LED_PIN 17u
 #define SWITCH_PIN 21u
 #define DELAY_TIME_uSec 1000u
+#define PWM_CLOCK_DIVIDER 2u
 
 int main()
 {
     PSP_GPIO_Set_Pin_Mode(LED_PIN, PSP_GPIO_PINMODE_OUTPUT);
     PSP_GPIO_Set_Pin_Mode(SWITCH_PIN, PSP_GPIO_PINMODE_INPUT);
 
-    BSP_PWM_Clock_Init();
-    BSP_PWM_Ch1_Start();
+    BSP_PWM_Clock_Init(BSP_PWM_Clock_Source_OSCILLATOR, PWM_CLOCK_DIVIDER);
+    BSP_PWM_Channel_Start(BSP_PWM_Channel_1, BSP_PWM_MARK_SPACE_MODE, BSP_PWM_RANGE_10_BITS);
     BSP_PWM_Ch1_Set_GPIO12_To_PWM_Mode();
 
-    uint8_t pwm_val = 0;
+    uint32_t pwm_val = 128;
 
     while(1)
     {
@@ -28,8 +29,10 @@ int main()
             PSP_GPIO_Write_Pin(LED_PIN, PSP_GPIO_PIN_WRITE_LOW);
             PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
 
+            // write a ramp wave via PWM
             BSP_PWM_Ch1_Write(pwm_val);
             pwm_val++;
+            pwm_val %= BSP_PWM_RANGE_10_BITS;
         }
     }
 
