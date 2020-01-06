@@ -4,6 +4,8 @@
 
 ### It is hoped that accessing the peripherals in C will aid in understanding and debugging the assembly code.
 
+### As peripheral modules are added, I'll add simple demos to the Hardware_Demos.h file. Then, in main.c, uncomment exactly one of the peripheral demo functions before compiling.
+
 ### How to use this repo:
 
 1. Clone a local copy on your machine.
