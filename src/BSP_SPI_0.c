@@ -113,6 +113,47 @@ uint16_t BSP_SPI0_Transfer_16(uint16_t val)
 }
 
 
+
+void BSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32_t num_bytes)
+{
+    uint32_t num_bytes_written = 0u;
+    uint32_t num_bytes_read = 0u;
+
+    // clear the fifo
+    BSP_SPI_0_CS_R |= SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
+
+    // set Transfer Active high to enable transfer
+    BSP_SPI_0_CS_R |= SPI_0_CS_TA;
+
+    // write and read the given number of bytes of data 
+    while ((num_bytes_written < num_bytes) || (num_bytes_read < num_bytes))
+    { 
+        // the Tx fifo can accept data and there is data to write
+        while((BSP_SPI_0_CS_R & SPI_0_CS_TXD) && (num_bytes_written < num_bytes))
+        {
+            BSP_SPI_0_FIFO_R = (uint8_t)p_Tx_buffer[num_bytes_written];
+            num_bytes_written++;
+        }
+
+        // the Rx fifo has data in it and there is data to read
+        while((BSP_SPI_0_CS_R & SPI_0_CS_RXD) && (num_bytes_read < num_bytes))
+        {
+            p_Rx_buffer[num_bytes_read] = (uint8_t)BSP_SPI_0_FIFO_R;
+            num_bytes_read++;
+        }
+    }
+
+    while (!(BSP_SPI_0_CS_R & SPI_0_CS_DONE))
+    {
+        // wait for the transfer to complete
+    }
+
+    // set transfer active low to end the transfer
+    BSP_SPI_0_CS_R &= ~(SPI_0_CS_TA);
+}
+
+
+
 void BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_t chip_select)
 {
     BSP_SPI_0_CS_R = (BSP_SPI_0_CS_R & 0xFFFFFFFCu) | chip_select;

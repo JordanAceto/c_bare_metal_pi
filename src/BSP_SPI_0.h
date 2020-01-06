@@ -240,6 +240,31 @@ uint16_t BSP_SPI0_Transfer_16(uint16_t val);
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
+    BSP_SPI0_Buffer_Transfer
+
+Function Description:
+    Write and read a given number of bytes via Tx and Rx buffers
+
+Inputs:
+    p_Tx_buffer: pointer to the buffer of bytes to write out via SPI 0.
+    p_Rx_buffer: pointer to the buffer of bytes to read in via SPI 0.
+    num_bytes: the number of bytes to write/read.
+
+Returns:
+    None. p_Rx_buffer will be filled with num_bytes of information if the device connected to the MISO
+    line sends any data during the transmission.
+
+Error Handling:
+    None, note that the Tx and Rx buffers MUST both be at least num_bytes long.
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32_t num_bytes);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
     BSP_SPI0_Set_Chip_Select
 
 Function Description:
