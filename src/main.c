@@ -20,6 +20,7 @@ int main()
 
     BSP_SPI0_Start();
     BSP_SPI0_Set_Clock_Divider(BSP_SPI0_Clock_Divider_1024);
+    BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_1);
 
     uint32_t pwm_val = 128;
 
@@ -38,11 +39,12 @@ int main()
             pwm_val++;
             pwm_val %= BSP_PWM_RANGE_10_BITS;
             
+            BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_0);
             BSP_SPI0_Transfer_Byte(0xBEu);
             BSP_SPI0_Transfer_Byte(0xEFu);
 
-            BSP_SPI0_Transfer_Byte(0xF0u);
-            BSP_SPI0_Transfer_Byte(0x0Du);
+            BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_1);
+            BSP_SPI0_Transfer_16(0xF00Du);
         }
     }
 
