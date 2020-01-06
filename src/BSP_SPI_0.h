@@ -87,6 +87,15 @@ typedef enum
     BSP_SPI0_Clock_Divider_32768 = 32768u  // sets SPI 0 clock to 7629 Hz
 } BSP_SPI_0_Clock_Divider_t;
 
+
+typedef enum
+{
+    BSP_SPI_0_Chip_Select_0 = 0u,
+    BSP_SPI_0_Chip_Select_1 = 1u
+} BSP_SPI_0_Chip_Select_t;
+
+
+
 /*-----------------------------------------------------------------------------------------------
     Public BSP_SPI_0 Function Declarations
  -------------------------------------------------------------------------------------------------*/
@@ -99,7 +108,8 @@ Function Name:
 
 Function Description:
     Initialize SPI0 by setting GPIO pins 7 through 11 to alt mode 0, zeroing the SPI0 status
-    and control register, and clearing the SPI0 Rx FIFO and Tx FIFO buffers.
+    and control register, clearing the SPI0 Rx FIFO and Tx FIFO buffers, and setting the chip
+    select pin to chip select 0.
 
 Inputs:
     None
@@ -202,6 +212,51 @@ Error Handling:
 
 -------------------------------------------------------------------------------------------------*/
 uint8_t BSP_SPI0_Transfer_Byte(uint8_t val);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_SPI0_Transfer_16
+
+Function Description:
+    Write and read a 16 bit word via SPI 0. Uses Polled transfer as described in section 10.6.1 of the datasheet.
+
+Inputs:
+    val: the 16 bit value to write via SPI 0.
+
+Returns:
+    uint16_t: the value read by SPI 0.
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+uint16_t BSP_SPI0_Transfer_16(uint16_t val);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_SPI0_Set_Chip_Select
+
+Function Description:
+    Choose which chip select line to assert when transferring data.
+
+Inputs:
+    chip_select: the chip select line to use, 0 or 1. Has no immediate effect, but the next
+    time a data transfer occurs the new chip select line will be used.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_t chip_select);
 
 
 

@@ -18,6 +18,9 @@ void BSP_SPI0_Start(void)
 
     // clear the fifo
     BSP_SPI_0_CS_R = SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
+
+    // default to chip select 0
+    BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_0);
 }
 
 
@@ -70,4 +73,47 @@ uint8_t BSP_SPI0_Transfer_Byte(uint8_t val)
 
     // return the return value
     return retval;
+}
+
+
+
+uint16_t BSP_SPI0_Transfer_16(uint16_t val)
+{
+    // clear the fifo
+    BSP_SPI_0_CS_R |= SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
+
+    // set Transfer Active high to enable transfer
+    BSP_SPI_0_CS_R |= SPI_0_CS_TA;
+
+    while (!(BSP_SPI_0_CS_R & SPI_0_CS_TXD))
+    {
+        // wait for TX fifo to be ready to accept data
+    }
+
+    uint8_t high_byte = val >> 8u;
+    uint8_t low_byte = val & 0xFFu;
+
+    // write the value into the fifo, high byte first
+    BSP_SPI_0_FIFO_R = high_byte;
+    BSP_SPI_0_FIFO_R = low_byte;
+
+    while (!(BSP_SPI_0_CS_R & SPI_0_CS_DONE))
+    {
+        // wait for the transfer to complete
+    }
+
+    // read the value in the fifo
+    uint16_t retval = BSP_SPI_0_FIFO_R;
+
+    // set transfer active low to end the transfer
+    BSP_SPI_0_CS_R &= ~(SPI_0_CS_TA);
+
+    // return the return value
+    return retval;
+}
+
+
+void BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_t chip_select)
+{
+    BSP_SPI_0_CS_R = (BSP_SPI_0_CS_R & 0xFFFFFFFCu) | chip_select;
 }
