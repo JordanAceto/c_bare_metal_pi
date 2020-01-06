@@ -8,7 +8,8 @@ int main()
 
     // demo_GPIO();
     // demo_PWM();
-    demo_SPI_0();
+    // demo_SPI_0();
+    demo_I2C();
 
     return 0;
 }

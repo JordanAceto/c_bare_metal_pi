@@ -6,6 +6,9 @@
 #include "PSP_Time.h"
 #include "BSP_PWM.h"
 #include "BSP_SPI_0.h"
+#include "BSP_I2C.h"
+
+
 
 /**
  * Simple demo of using GPIO pins as inputs and outputs.
@@ -36,6 +39,8 @@ void demo_GPIO()
     }
 }
 
+
+
 /**
  * Simple demo of hardware PWM.
  * 
@@ -63,6 +68,8 @@ void demo_PWM()
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
     }
 }
+
+
 
 /**
  * Simple demo of SPI 0.
@@ -101,5 +108,41 @@ void demo_SPI_0()
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
     }
 }
+
+
+
+/**
+ * Simple demo of I2C bus.
+ * 
+ * Writes a few bytes via I2C.
+ * 
+ * To verify: you need a device to talk to, and then a logic analyzer or scope or some way of seeing
+ * what you wrote. I used an LCD at address 0x27 that was lying around and a scope to decode the bytes
+ * sent. 
+ * 
+ * If you don't have a I2C device handy with a known address, you're out of luck.
+ */ 
+void demo_I2C()
+{
+    const uint32_t DELAY_TIME_uSec = 1000u;
+
+    const uint32_t SLAVE_ADDRESS = 0x27u;
+
+    BSP_I2C_Start();
+    // use default divider for ~100kHz clock speed
+    BSP_I2C_Set_Slave_Address(SLAVE_ADDRESS);
+
+    while (1)
+    {
+        BSP_I2C_Write_Byte(0xFEu);
+        BSP_I2C_Write_Byte(0xEDu);
+        BSP_I2C_Write_Byte(0xFAu);
+        BSP_I2C_Write_Byte(0xCEu);
+
+        PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);    
+    }
+}
+
+
 
 #endif
