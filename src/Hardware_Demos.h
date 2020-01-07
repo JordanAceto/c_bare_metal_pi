@@ -23,6 +23,7 @@
 #include "BSP_PWM.h"
 #include "BSP_SPI_0.h"
 #include "BSP_I2C.h"
+#include "BSP_Auxiliaries.h"
 
 
 
@@ -160,5 +161,23 @@ void demo_I2C()
 }
 
 
+
+void demo_Mini_Uart()
+{
+    const uint32_t DELAY_TIME_uSec = 10000u;
+
+    BSP_AUX_Mini_Uart_Init(BSP_AUX_Mini_Uart_Baud_Rate_9600);
+
+
+    while (1)
+    {
+        BSP_AUX_Mini_Uart_Send_Byte(0xBEu);
+        BSP_AUX_Mini_Uart_Send_Byte(0xEFu);
+        BSP_AUX_Mini_Uart_Send_Byte(0xF0u);
+        BSP_AUX_Mini_Uart_Send_Byte(0x0Du);
+
+        PSP_Time_Delay_Microseconds(DELAY_TIME_uSec); 
+    }
+}
 
 #endif
