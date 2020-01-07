@@ -1,9 +1,102 @@
 
 #include "PSP_GPIO.h"
+#include "PSP_REGS.h"
 
 /*-----------------------------------------------------------------------------------------------
     Private PSP_GPIO Defines
  -------------------------------------------------------------------------------------------------*/
+
+// Register Addresses
+#define GPIO_BASE_ADDRESS    (PSP_REGS_GPIO_BASE_ADDRESS)
+
+#define PSP_GPIO_GPFSEL0_A   (GPIO_BASE_ADDRESS | 0x00000000u)  // GPIO Function Select 0 address
+#define PSP_GPIO_GPFSEL1_A   (GPIO_BASE_ADDRESS | 0x00000004u)  // GPIO Function Select 1 address
+#define PSP_GPIO_GPFSEL2_A   (GPIO_BASE_ADDRESS | 0x00000008u)  // GPIO Function Select 2 address
+#define PSP_GPIO_GPFSEL3_A   (GPIO_BASE_ADDRESS | 0x0000000Cu)  // GPIO Function Select 3 address
+#define PSP_GPIO_GPFSEL4_A   (GPIO_BASE_ADDRESS | 0x00000010u)  // GPIO Function Select 4 address
+#define PSP_GPIO_GPFSEL5_A   (GPIO_BASE_ADDRESS | 0x00000014u)  // GPIO Function Select 5 address
+
+#define PSP_GPIO_GPSET0_A    (GPIO_BASE_ADDRESS | 0x0000001Cu)  // GPIO Pin Output Set 0 address
+#define PSP_GPIO_GPSET1_A    (GPIO_BASE_ADDRESS | 0x00000020u)  // GPIO Pin Output Set 1 address
+
+#define PSP_GPIO_GPCLR0_A    (GPIO_BASE_ADDRESS | 0x00000028u)  // GPIO Pin Output Clear 0 address
+#define PSP_GPIO_GPCLR1_A    (GPIO_BASE_ADDRESS | 0x0000002Cu)  // GPIO Pin Output Clear 1 address
+
+#define PSP_GPIO_GPLEV0_A    (GPIO_BASE_ADDRESS | 0x00000034u)  // GPIO Pin Level 0 address
+#define PSP_GPIO_GPLEV1_A    (GPIO_BASE_ADDRESS | 0x00000038u)  // GPIO Pin Level 1 address
+
+#define PSP_GPIO_GPEDS0_A    (GPIO_BASE_ADDRESS | 0x00000040u)  // GPIO Pin Event Detect Status 0 address
+#define PSP_GPIO_GPEDS1_A    (GPIO_BASE_ADDRESS | 0x00000044u)  // GPIO Pin Event Detect Status 1 address
+
+#define PSP_GPIO_GPREN0_A    (GPIO_BASE_ADDRESS | 0x0000004Cu)  // GPIO Pin Rising Edge Detect Enable 0 address
+#define PSP_GPIO_GPREN1_A    (GPIO_BASE_ADDRESS | 0x00000050u)  // GPIO Pin Rising Edge Detect Enable 1 address
+
+#define PSP_GPIO_GPFEN0_A    (GPIO_BASE_ADDRESS | 0x00000058u)  // GPIO Pin Falling Edge Detect Enable 0 address
+#define PSP_GPIO_GPFEN1_A    (GPIO_BASE_ADDRESS | 0x0000005Cu)  // GPIO Pin Falling Edge Detect Enable 1 address
+
+#define PSP_GPIO_GPHEN0_A    (GPIO_BASE_ADDRESS | 0x00000064u)  // GPIO Pin High Detect Enable 0 address
+#define PSP_GPIO_GPHEN1_A    (GPIO_BASE_ADDRESS | 0x00000068u)  // GPIO Pin High Detect Enable 1 address
+
+#define PSP_GPIO_GPLEN0_A    (GPIO_BASE_ADDRESS | 0x00000070u)  // GPIO Pin Low Detect Enable 0 address
+#define PSP_GPIO_GPLEN1_A    (GPIO_BASE_ADDRESS | 0x00000074u)  // GPIO Pin Low Detect Enable 1 address
+
+#define PSP_GPIO_GPAREN0_A   (GPIO_BASE_ADDRESS | 0x0000007Cu)  // GPIO Pin Async. Rising Edge Detect 0 address
+#define PSP_GPIO_GPAREN1_A   (GPIO_BASE_ADDRESS | 0x00000080u)  // GPIO Pin Async. Rising Edge Detect 1 address
+
+#define PSP_GPIO_GPAFEN0_A   (GPIO_BASE_ADDRESS | 0x00000088u)  // GPIO Pin Async. Falling Edge Detect 0 address
+#define PSP_GPIO_GPAFEN1_A   (GPIO_BASE_ADDRESS | 0x0000008Cu)  // GPIO Pin Async. Falling Edge Detect 1 address
+
+#define PSP_GPIO_GPPUD_A     (GPIO_BASE_ADDRESS | 0x00000094u)  // GPIO Pin Pull-up/down Enable address
+
+#define PSP_GPIO_GPPUDCLK0_A (GPIO_BASE_ADDRESS | 0x00000098u)  // GPIO Pin Pull-up/down Enable Clock 0 address
+#define PSP_GPIO_GPPUDCLK1_A (GPIO_BASE_ADDRESS | 0x0000009Cu)  // GPIO Pin Pull-up/down Enable Clock 1 address
+
+// Register Pointers
+#define PSP_GPIO_GPFSEL0_R   (*((volatile uint32_t *)PSP_GPIO_GPFSEL0_A))   // GPIO Function Select 0 register
+#define PSP_GPIO_GPFSEL1_R   (*((volatile uint32_t *)PSP_GPIO_GPFSEL1_A))   // GPIO Function Select 1 register
+#define PSP_GPIO_GPFSEL2_R   (*((volatile uint32_t *)PSP_GPIO_GPFSEL2_A))   // GPIO Function Select 2 register
+#define PSP_GPIO_GPFSEL3_R   (*((volatile uint32_t *)PSP_GPIO_GPFSEL3_A))   // GPIO Function Select 3 register
+#define PSP_GPIO_GPFSEL4_R   (*((volatile uint32_t *)PSP_GPIO_GPFSEL4_A))   // GPIO Function Select 4 register
+#define PSP_GPIO_GPFSEL5_R   (*((volatile uint32_t *)PSP_GPIO_GPFSEL5_A))   // GPIO Function Select 5 register
+
+#define PSP_GPIO_GPSET0_R    (*((volatile uint32_t *)PSP_GPIO_GPSET0_A))    // GPIO Pin Output Set 0 register
+#define PSP_GPIO_GPSET1_R    (*((volatile uint32_t *)PSP_GPIO_GPSET1_A))    // GPIO Pin Output Set 1 register
+
+#define PSP_GPIO_GPCLR0_R    (*((volatile uint32_t *)PSP_GPIO_GPCLR0_A))    // GPIO Pin Output Clear 0 register
+#define PSP_GPIO_GPCLR1_R    (*((volatile uint32_t *)PSP_GPIO_GPCLR1_A))    // GPIO Pin Output Clear 1 register
+
+#define PSP_GPIO_GPLEV0_R    (*((volatile uint32_t *)PSP_GPIO_GPLEV0_A))    // GPIO Pin Level 0 register
+#define PSP_GPIO_GPLEV1_R    (*((volatile uint32_t *)PSP_GPIO_GPLEV1_A))    // GPIO Pin Level 1 register
+
+#define PSP_GPIO_GPEDS0_R    (*((volatile uint32_t *)PSP_GPIO_GPEDS0_A))    // GPIO Pin Event Detect Status 0 register
+#define PSP_GPIO_GPEDS1_R    (*((volatile uint32_t *)PSP_GPIO_GPEDS1_A))    // GPIO Pin Event Detect Status 1 register
+
+#define PSP_GPIO_GPREN0_R    (*((volatile uint32_t *)PSP_GPIO_GPREN0_A))    // GPIO Pin Rising Edge Detect Enable 0 register
+#define PSP_GPIO_GPREN1_R    (*((volatile uint32_t *)PSP_GPIO_GPREN1_A))    // GPIO Pin Rising Edge Detect Enable 1 register
+
+#define PSP_GPIO_GPFEN0_R    (*((volatile uint32_t *)PSP_GPIO_GPFEN0_A))    // GPIO Pin Falling Edge Detect Enable 0 register
+#define PSP_GPIO_GPFEN1_R    (*((volatile uint32_t *)PSP_GPIO_GPFEN1_A))    // GPIO Pin Falling Edge Detect Enable 1 register
+
+#define PSP_GPIO_GPHEN0_R    (*((volatile uint32_t *)PSP_GPIO_GPHEN0_A))    // GPIO Pin High Detect Enable 0 register
+#define PSP_GPIO_GPHEN1_R    (*((volatile uint32_t *)PSP_GPIO_GPHEN1_A))    // GPIO Pin High Detect Enable 1 register
+
+#define PSP_GPIO_GPLEN0_R    (*((volatile uint32_t *)PSP_GPIO_GPLEN0_A))    // GPIO Pin Low Detect Enable 0 register
+#define PSP_GPIO_GPLEN1_R    (*((volatile uint32_t *)PSP_GPIO_GPLEN1_A))    // GPIO Pin Low Detect Enable 1 register
+
+#define PSP_GPIO_GPAREN0_R   (*((volatile uint32_t *)PSP_GPIO_GPAREN0_A))   // GPIO Pin Async. Rising Edge Detect 0 register
+#define PSP_GPIO_GPAREN1_R   (*((volatile uint32_t *)PSP_GPIO_GPAREN1_A))   // GPIO Pin Async. Rising Edge Detect 1 register
+
+#define PSP_GPIO_GPAFEN0_R   (*((volatile uint32_t *)PSP_GPIO_GPAFEN0_A))   // GPIO Pin Async. Falling Edge Detect 0 register
+#define PSP_GPIO_GPAFEN1_R   (*((volatile uint32_t *)PSP_GPIO_GPAFEN1_A))   // GPIO Pin Async. Falling Edge Detect 1 register
+
+#define PSP_GPIO_GPPUD_R     (*((volatile uint32_t *)PSP_GPIO_GPPUD_A))     // GPIO Pin Pull-up/down Enable register
+
+#define PSP_GPIO_GPPUDCLK0_R (*((volatile uint32_t *)PSP_GPIO_GPPUDCLK0_A)) // GPIO Pin Pull-up/down Enable Clock 0 register
+#define PSP_GPIO_GPPUDCLK1_R (*((volatile uint32_t *)PSP_GPIO_GPPUDCLK1_A)) // GPIO Pin Pull-up/down Enable Clock 1 register
+
+#define PSP_GPIO_NUM_GPIO_PINS  54u
+#define PSP_GPIO_MAX_PINMODE_VALUE 0b111u
+
 #define NUM_PINS_PER_GPFSEL_REG 10u
 #define NUM_BITS_USED_IN_PINMODE 3u
 #define HIGHEST_BIT_POSITION_IN_A_REGISTER 31u

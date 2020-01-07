@@ -2,6 +2,63 @@
 #include "BSP_SPI_0.h"
 #include "PSP_GPIO.h"
 
+#include "PSP_REGS.h"
+
+
+/*-----------------------------------------------------------------------------------------------
+    Private BSP_SPI_0 Defines
+ -------------------------------------------------------------------------------------------------*/
+
+// SPI 0 Register Addresses
+#define BSP_SPI_0_BASE_A      (PSP_REGS_SPI_0_BASE_ADDRESS) 
+#define BSP_SPI_0_CS_A        (PSP_REGS_SPI_0_BASE_ADDRESS | 0x00000000u) // SPI Master Control and Status address
+#define BSP_SPI_0_FIFO_A      (PSP_REGS_SPI_0_BASE_ADDRESS | 0x00000004u) // SPI Master TX and RX FIFOs address
+#define BSP_SPI_0_CLK_A       (PSP_REGS_SPI_0_BASE_ADDRESS | 0x00000008u) // SPI Master Clock Divider address
+#define BSP_SPI_0_DLEN_A      (PSP_REGS_SPI_0_BASE_ADDRESS | 0x0000000Cu) // SPI Master Data Length address
+#define BSP_SPI_0_LTOH_A      (PSP_REGS_SPI_0_BASE_ADDRESS | 0x00000010u) // SPI LOSSI mode TOH address
+#define BSP_SPI_0_DC_A        (PSP_REGS_SPI_0_BASE_ADDRESS | 0x00000014u) // SPI DMA DREQ Controls address
+
+// SPI 0 Register Pointers
+#define BSP_SPI_0_CS_R        (*((volatile uint32_t *)BSP_SPI_0_CS_A))    // SPI Master Control and Status register
+#define BSP_SPI_0_FIFO_R      (*((volatile uint32_t *)BSP_SPI_0_FIFO_A))  // SPI Master TX and RX FIFOs register
+#define BSP_SPI_0_CLK_R       (*((volatile uint32_t *)BSP_SPI_0_CLK_A))   // SPI Master Clock Divider register
+#define BSP_SPI_0_DLEN_R      (*((volatile uint32_t *)BSP_SPI_0_DLEN_A))  // SPI Master Data Length register
+#define BSP_SPI_0_LTOH_R      (*((volatile uint32_t *)BSP_SPI_0_LTOH_A))  // SPI LOSSI mode TOH register
+#define BSP_SPI_0_DC_R        (*((volatile uint32_t *)BSP_SPI_0_DC_A))    // SPI DMA DREQ Controls register
+
+// SPI 0 Control Register Masks
+#define SPI_0_CS_LEN_LONG   0x02000000u  // Enable Long data word in Lossi mode if DMA_LEN is set
+#define SPI_0_CS_DMA_LEN    0x01000000u  // Enable DMA mode in Lossi mode
+#define SPI_0_CS_CSPOL2     0x00800000u  // Chip Select 2 Polarity
+#define SPI_0_CS_CSPOL1     0x00400000u  // Chip Select 1 Polarity
+#define SPI_0_CS_CSPOL0     0x00200000u  // Chip Select 0 Polarity
+#define SPI_0_CS_RXF        0x00100000u  // RXF - RX FIFO Full
+#define SPI_0_CS_RXR        0x00080000u  // RXR RX FIFO needs Reading ( full)
+#define SPI_0_CS_TXD        0x00040000u  // TXD TX FIFO can accept Data
+#define SPI_0_CS_RXD        0x00020000u  // RXD RX FIFO contains Data
+#define SPI_0_CS_DONE       0x00010000u  // Done transfer Done
+#define SPI_0_CS_TE_EN      0x00008000u  // Unused
+#define SPI_0_CS_LMONO      0x00004000u  // Unused
+#define SPI_0_CS_LEN        0x00002000u  // LEN LoSSI enable
+#define SPI_0_CS_REN        0x00001000u  // REN Read Enable
+#define SPI_0_CS_ADCS       0x00000800u  // ADCS Automatically Deassert Chip Select
+#define SPI_0_CS_INTR       0x00000400u  // INTR Interrupt on RXR
+#define SPI_0_CS_INTD       0x00000200u  // INTD Interrupt on Done
+#define SPI_0_CS_DMAEN      0x00000100u  // DMAEN DMA Enable
+#define SPI_0_CS_TA         0x00000080u  // Transfer Active
+#define SPI_0_CS_CSPOL      0x00000040u  // Chip Select Polarity
+#define SPI_0_CS_CLEAR1     0x00000020u  // CLEAR FIFO Clear 1
+#define SPI_0_CS_CLEAR2     0x00000010u  // CLEAR FIFO Clear 2
+#define SPI_0_CS_CPOL       0x00000008u  // Clock Polarity
+#define SPI_0_CS_CPHA       0x00000004u  // Clock Phase
+#define SPI_0_CS_CS1        0x00000002u  // Chip Select 1
+#define SPI_0_CS_CS2        0x00000001u  // Chip Select 2
+
+
+
+/*-----------------------------------------------------------------------------------------------
+    BSP_SPI_0 Function Definitions
+ -------------------------------------------------------------------------------------------------*/
 
 
 void BSP_SPI0_Start(void)
