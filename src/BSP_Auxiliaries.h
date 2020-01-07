@@ -127,4 +127,26 @@ void BSP_AUX_Mini_Uart_Send_Byte(uint8_t value);
 
 
 
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_AUX_Mini_Uart_Send_String
+
+Function Description:
+    Send a C-String via mini uart Tx.
+
+Inputs:
+    c_string: the C_String to send.
+
+Returns:
+    None.
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_AUX_Mini_Uart_Send_String(char* c_string);
+
+
+
 #endif

@@ -172,3 +172,14 @@ void BSP_AUX_Mini_Uart_Send_Byte(uint8_t value)
     // write the value to the I/O register
     BSP_AUX_MU_IO_REG_R = value;
 }
+
+
+
+void BSP_AUX_Mini_Uart_Send_String(char * c_string)
+{
+    
+    for (int i = 0u; c_string[i] != '\0'; i++)
+    {
+        BSP_AUX_Mini_Uart_Send_Byte(c_string[i]);
+    }
+}
