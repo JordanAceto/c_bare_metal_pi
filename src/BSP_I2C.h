@@ -1,3 +1,17 @@
+/**
+ * DESCRIPTION:
+ *      BSP_I2C provides an interface for using I2C.
+ * 
+ * NOTES:
+ *      TODO: Writing data has been tested, but reading data has not. To do so,
+ *      I'll need to set up some I2C device to talk back to the Pi and run some
+ *      tests. Until then, consider reading data to be broken.
+ * 
+ *      TODO: Add functions to read/write more than one byte at a time.
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf page 28
+ */
 
 #ifndef BSP_I2C_H_INCLUDED
 #define BSP_I2C_H_INCLUDED

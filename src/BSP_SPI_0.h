@@ -1,3 +1,15 @@
+/**
+ * DESCRIPTION:
+ *      BSP_SPI_0 provides an interface for using SPI 0.
+ * 
+ * NOTES:
+ *      TODO: Writing data has been tested, but reading data has not. To do so,
+ *      I'll need to set up some SPI device to talk back to the Pi and run some
+ *      tests. Until then, consider reading data to be broken.
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf page 148
+ */
 
 #ifndef SPI_0_H_INCLUDED
 #define SPI_0_H_INCLUDED

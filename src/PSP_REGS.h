@@ -1,3 +1,16 @@
+/**
+ * DESCRIPTION:
+ *      PSP_REGS simply keeps a publicly available list of register addresses,
+ *      as well as the peripheral base address.
+ * 
+ * NOTES:
+ *      TODO: For now this only works with the Raspberry Pi 3b+ and other Pis with 
+ *      0x3F000000u as their peripheral base address. Add #ifdef statements
+ *      so that it can work with other hardware.
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf 
+ */
 
 #ifndef PSP_REGS_H_INCLUDED
 #define PSP_REGS_H_INCLUDED

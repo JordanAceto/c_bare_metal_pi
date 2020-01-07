@@ -1,3 +1,15 @@
+/**
+ * DESCRIPTION:
+ *      PSP_Time interfaces with the System Clock timer, providing 
+ *      functions for getting the current time and delaying for a
+ *      specified amount of time.
+ * 
+ * NOTES:
+ *      TODO: Add milliseconds get/delay functions (only has microseconds for now)
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf page 172
+ */
 
 #ifndef PSP_TIME_H_INCLUDED
 #define PSP_TIME_H_INCLUDED

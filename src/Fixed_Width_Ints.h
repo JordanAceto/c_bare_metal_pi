@@ -1,3 +1,16 @@
+/**
+ * DESCRIPTION:
+ *      Fixed Width Ints simply provides typedefs for standard fixed width
+ *      integer types.
+ * 
+ * NOTES:
+ *      Assumes the Raspberry Pi is operating in 32 bit mode.
+ * 
+ * REFERENCES:
+ *      https://raspberry-projects.com/pi/programming-in-c/memory/variables
+ */
+
+
 #ifndef FIXED_WIDTH_INTS_H_INCLUDED
 #define FIXED_WIDTH_INTS_H_INCLUDED
 

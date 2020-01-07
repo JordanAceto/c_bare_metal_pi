@@ -1,3 +1,19 @@
+/**
+ * DESCRIPTION:
+ *      Hardware Demos provides a suite of simple demo functions for each of the peripherals
+ *      as I get them working. The idea is to demo the hardware as simply as possible, to 
+ *      verify that it is working.
+ * 
+ * NOTES:
+ *      Each demo enters an infinite loop and does not return. This is so that I can run a demo 
+ *      and probe various ports on the board while it is running to validate the functionality
+ *      of the given peripheral module.
+ * 
+ *      TODO: As new peripheral interfaces are implemented, new demo functions will be added here.
+ * 
+ * REFERENCES:
+ *      Pinouts: https://www.raspberrypi.org/documentation/usage/gpio/
+ */
 
 #ifndef HARDWARE_DEMOS_H_INCLUDED
 #define HARDWARE_DEMOS_H_INCLUDED

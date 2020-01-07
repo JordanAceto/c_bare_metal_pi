@@ -1,3 +1,16 @@
+/**
+ * DESCRIPTION:
+ *      BSP_PWM provides an interface for using the hardware PWM channels 1 and 2.
+ * 
+ * NOTES:
+ *      Only GPIO12 and GPIO18 are available as channel 1 PWM pins and only GPIO13 
+ *      and GPIO19 are available as channel 2 PWM pins on the raspberry pi 3b+ breakout board.
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf page 138
+ */
+
+
 #ifndef BPS_PWM_H_INCLUDED
 #define BPS_PWM_H_INCLUDED
 

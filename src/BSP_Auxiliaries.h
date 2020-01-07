@@ -1,3 +1,14 @@
+/**
+ * DESCRIPTION:
+ *      BSP_Auxiliaries provides interfaces for the mini uart, aux spi 1, and aux spi 2.
+ * 
+ * NOTES:
+ *      TODO: This module has just been started, most addresses have been defined, as well
+ *      as some bit masks for the mini uart, but consider this just a rough start.
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf page 8
+ */
 
 #ifndef BSP_AUXILIARIES_H_INCLUDED
 #define BSP_AUXILIARIES_H_INCLUDED
@@ -80,7 +91,7 @@
 #define AUX_MU_LCR_DLAB_ACCESS 0x80u // give access the the Baudrate register.
 #define AUX_MU_LCR_BREAK       0x40u // If set high the UART1_TX line is pulled low continuously
 #define AUX_MU_LCR_7_BIT_MODE  0x00u // the UART works in 7-bit mode
-#define AUX_MU_LCR_7_BIT_MODE  0x03u // the UART works in 8-bit mode
+#define AUX_MU_LCR_8_BIT_MODE  0x03u // the UART works in 8-bit mode
 
 // Mini UART Modem Control Register Masks
 #define AUX_MU_MCR_RTS 0x02u // If clear the UART1_RTS line is high. If set the UART1_RTS line is low

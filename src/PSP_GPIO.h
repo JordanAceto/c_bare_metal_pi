@@ -1,3 +1,16 @@
+/**
+ * DESCRIPTION:
+ *      PSP_GPIO interfaces with the GPIO registers. Functions are
+ *      provided for setting the pin mode of GPIO pins, reading the
+ *      level of GPIO pins, and setting the level of GPIO pins which
+ *      are set to outputs.
+ * 
+ * NOTES:
+ *      TODO: Add edge detection functionality.
+ * 
+ * REFERENCES:
+ *      BCM2837-ARM-Peripherals.pdf page 89
+ */
 
 #ifndef PSP_GPIO_H_INCLUDED
 #define PSP_GPIO_H_INCLUDED
