@@ -127,7 +127,7 @@
 
 void BSP_AUX_Mini_Uart_Init(BSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
 {
-    // set pins 14 and 15 to aux 5 for mini uart
+    // set pins 14 and 15 to alt pin mode 5 for mini uart
     PSP_GPIO_Set_Pin_Mode(BSP_AUX_MINI_UART_TX_PIN, PSP_GPIO_PINMODE_ALT5);
     PSP_GPIO_Set_Pin_Mode(BSP_AUX_MINI_UART_RX_PIN, PSP_GPIO_PINMODE_ALT5);
 

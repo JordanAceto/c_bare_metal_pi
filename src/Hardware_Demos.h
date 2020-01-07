@@ -161,7 +161,15 @@ void demo_I2C()
 }
 
 
-
+/**
+ * Simple demo of Auxiliary Mini Uart.
+ * 
+ * Writes a few bytes via mini uart Tx.
+ * 
+ * To verify: you'll need a logic analyzer/scope/some device you can talk to.
+ * 
+ * In a pinch, put a LED on pin 14.
+ */ 
 void demo_Mini_Uart()
 {
     const uint32_t DELAY_TIME_uSec = 10000u;

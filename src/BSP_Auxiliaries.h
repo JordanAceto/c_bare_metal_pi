@@ -6,6 +6,10 @@
  *      TODO: This module has just been started, most addresses have been defined, as well
  *      as some bit masks for the mini uart, but consider this just a rough start.
  * 
+ *      Mini uart init, set baud rate, and write bytes are started, but not thoroughly 
+ *      verified. In particular, need to check that the baud rate enums actually
+ *      result in the proper baud rates.
+ * 
  * REFERENCES:
  *      BCM2837-ARM-Peripherals.pdf page 8
  */
@@ -21,6 +25,7 @@
     Public BSP_Auxiliaries Defines
  -------------------------------------------------------------------------------------------------*/
 
+// mini uart pins
 #define BSP_AUX_MINI_UART_TX_PIN 14u
 #define BSP_AUX_MINI_UART_RX_PIN 15u
 
@@ -30,6 +35,7 @@
     Public BSP_Auxiliaries Types
  -------------------------------------------------------------------------------------------------*/
 
+// mini uart baud rate enum
 typedef enum
 {
     BSP_AUX_Mini_Uart_Baud_Rate_9600   = 3254u, // sets the mini uart baud rate to 9600
@@ -54,8 +60,8 @@ Function Name:
     BSP_AUX_Mini_Uart_Init
 
 Function Description:
-    Initialize the aux mini uart by setting GPIO pins 14 and 15 to alt function 5 and setting
-    the baud rate to the given parameter.
+    Initialize the aux mini uart by setting GPIO pins 14 and 15 to alt function 5, disabling
+    mini uart interrupts, enabling 8-bit mode, and setting the baud rate to the given parameter.
 
 Inputs:
     baud_rate_enum: the initial baud rate to use.
@@ -105,7 +111,7 @@ Function Name:
     BSP_AUX_Mini_Uart_Send_Byte
 
 Function Description:
-    Send a byte of data.
+    Send a byte of data via mini uart Tx.
 
 Inputs:
     value: the value of the byte to send.
