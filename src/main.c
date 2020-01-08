@@ -9,7 +9,8 @@ int main()
     // demo_GPIO();
     // demo_PWM();
     // demo_SPI_0();
-    demo_I2C();
+    // demo_I2C();
+    demo_Mini_Uart();
 
     return 0;
 }
