@@ -164,7 +164,7 @@ void demo_I2C()
 /**
  * Simple demo of Auxiliary Mini Uart.
  * 
- * Writes a few bytes via mini uart Tx.
+ * Writes a little string via mini uart Tx.
  * 
  * To verify: you'll need a logic analyzer/scope/some device you can talk to.
  * 
@@ -176,19 +176,9 @@ void demo_Mini_Uart()
 
     BSP_AUX_Mini_Uart_Init(BSP_AUX_Mini_Uart_Baud_Rate_9600);
 
-    // some c-string oddities below, I think it might have to do with the
-    // memory area for local variable not being zeroed out?
-
-    // char * strings act like they are not null-terminated when I call my
-    // BSP_AUX_Mini_Uart_Send_String function, but the char[] one works fine?
-
-    // char * str = "foo";   // this style of c-string doesn't work with uart
-    char str[] = { "bar" };  // but this one does
-
     while (1)
     {
-        BSP_AUX_Mini_Uart_Send_String(str);
-        // BSP_AUX_Mini_Uart_Send_String("quux"); // this doesn't work either
+        BSP_AUX_Mini_Uart_Send_String("quux");
 
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec); 
     }
