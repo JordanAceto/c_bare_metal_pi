@@ -23,7 +23,7 @@
 #include "BSP_PWM.h"
 #include "BSP_SPI_0.h"
 #include "BSP_I2C.h"
-#include "BSP_Auxiliaries.h"
+#include "BSP_Aux_Mini_UART.h"
 
 
 

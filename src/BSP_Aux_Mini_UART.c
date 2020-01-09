@@ -1,9 +1,10 @@
 
-#include "BSP_Auxiliaries.h"
+#include "BSP_Aux_Mini_UART.h"
 #include "PSP_REGS.h"
+#include "PSP_GPIO.h"
 
 /*------------------------------------------------------------------------------------------------
-    Private BSP_Auxiliaries Defines
+    Private BSP_Aux_Mini_UART Defines
  -------------------------------------------------------------------------------------------------*/
 
 // AUX Register Addresses
@@ -24,18 +25,6 @@
 #define BSP_AUX_MU_STAT_REG_A     (BSP_AUX_BASE_ADDRESS | 0x00000064u) // Mini Uart Extra Status address
 #define BSP_AUX_MU_BAUD_REG_A     (BSP_AUX_BASE_ADDRESS | 0x00000068u) // Mini Uart Baudrate address
 
-#define BSP_AUX_SPI_1_CNTL0_REG_A (BSP_AUX_BASE_ADDRESS | 0x00000080u) // SPI 1 Control register 0 address
-#define BSP_AUX_SPI_1_CNTL1_REG_A (BSP_AUX_BASE_ADDRESS | 0x00000084u) // SPI 1 Control register 1 address
-#define BSP_AUX_SPI_1_STAT_REG_A  (BSP_AUX_BASE_ADDRESS | 0x00000088u) // SPI 1 Status address
-#define BSP_AUX_SPI_1_IO_REG_A    (BSP_AUX_BASE_ADDRESS | 0x00000090u) // SPI 1 Data address
-#define BSP_AUX_SPI_1_PEEK_REG_A  (BSP_AUX_BASE_ADDRESS | 0x00000094u) // SPI 1 Peek address
-
-#define BSP_AUX_SPI_2_CNTL0_REG_A (BSP_AUX_BASE_ADDRESS | 0x000000C0u) // SPI 2 Control register 0 address
-#define BSP_AUX_SPI_2_CNTL1_REG_A (BSP_AUX_BASE_ADDRESS | 0x000000C4u) // SPI 2 Control register address
-#define BSP_AUX_SPI_2_STAT_REG_A  (BSP_AUX_BASE_ADDRESS | 0x000000C8u) // SPI 2 Status address
-#define BSP_AUX_SPI_2_IO_REG_A    (BSP_AUX_BASE_ADDRESS | 0x000000D0u) // SPI 2 Data address
-#define BSP_AUX_SPI_2_PEEK_REG_A  (BSP_AUX_BASE_ADDRESS | 0x000000D4u) // SPI 2 Peek address
-
 // AUX Register Pointers
 #define BSP_AUX_IRQ_R             (*((volatile uint32_t *)BSP_AUX_IRQ_A))             // Auxiliary Interrupt status register
 #define BSP_AUX_ENABLES_R         (*((volatile uint32_t *)BSP_AUX_ENABLES_A))         // Auxiliary enables register
@@ -51,18 +40,6 @@
 #define BSP_AUX_MU_CNTL_REG_R     (*((volatile uint32_t *)BSP_AUX_MU_CNTL_REG_A))     // Mini Uart Extra Control register
 #define BSP_AUX_MU_STAT_REG_R     (*((volatile uint32_t *)BSP_AUX_MU_STAT_REG_A))     // Mini Uart Extra Status register
 #define BSP_AUX_MU_BAUD_REG_R     (*((volatile uint32_t *)BSP_AUX_MU_BAUD_REG_A))     // Mini Uart Baudrate register
-
-#define BSP_AUX_SPI_1_CNTL0_REG_R (*((volatile uint32_t *)BSP_AUX_SPI_1_CNTL0_REG_A)) // SPI 1 Control register 0 register
-#define BSP_AUX_SPI_1_CNTL1_REG_R (*((volatile uint32_t *)BSP_AUX_SPI_1_CNTL1_REG_A)) // SPI 1 Control register 1 register
-#define BSP_AUX_SPI_1_STAT_REG_R  (*((volatile uint32_t *)BSP_AUX_SPI_1_STAT_REG_A))  // SPI 1 Status register
-#define BSP_AUX_SPI_1_IO_REG_R    (*((volatile uint32_t *)BSP_AUX_SPI_1_IO_REG_A))    // SPI 1 Data register
-#define BSP_AUX_SPI_1_PEEK_REG_R  (*((volatile uint32_t *)BSP_AUX_SPI_1_PEEK_REG_A))  // SPI 1 Peek register
-
-#define BSP_AUX_SPI_2_CNTL0_REG_R (*((volatile uint32_t *)BSP_AUX_SPI_2_CNTL0_REG_A)) // SPI 2 Control register 0 register
-#define BSP_AUX_SPI_2_CNTL1_REG_R (*((volatile uint32_t *)BSP_AUX_SPI_2_CNTL1_REG_A)) // SPI 2 Control register register
-#define BSP_AUX_SPI_2_STAT_REG_R  (*((volatile uint32_t *)BSP_AUX_SPI_2_STAT_REG_A))  // SPI 2 Status register
-#define BSP_AUX_SPI_2_IO_REG_R    (*((volatile uint32_t *)BSP_AUX_SPI_2_IO_REG_A))    // SPI 2 Data address
-#define BSP_AUX_SPI_2_PEEK_REG_R  (*((volatile uint32_t *)BSP_AUX_SPI_2_PEEK_REG_A))  // SPI 2 Peek address
 
 // AUX IRQ Register Masks
 #define AUX_MINI_UART_IRQ    0b001u // If set the mini UART has an interrupt pending
@@ -116,3 +93,69 @@
 #define AUX_MU_STAT_RC_IS_IDLE       0x004u // If this bit is set the receiver is idle
 #define AUX_MU_STAT_SPACE_AVAILABLE  0x002u // If this bit is set the mini UART transmitter FIFO can accept at least one more symbol
 #define AUX_MU_STAT_SYMBOL_AVAILABLE 0x001u // If this bit is set the mini UART receive FIFO contains at least 1 symbol
+
+
+
+
+/*-----------------------------------------------------------------------------------------------
+    BSP_Aux_Mini_UART Function Definitions
+ -------------------------------------------------------------------------------------------------*/
+
+void BSP_AUX_Mini_Uart_Init(BSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
+{
+    // set pins 14 and 15 to alt pin mode 5 for mini uart
+    PSP_GPIO_Set_Pin_Mode(BSP_AUX_MINI_UART_TX_PIN, PSP_GPIO_PINMODE_ALT5);
+    PSP_GPIO_Set_Pin_Mode(BSP_AUX_MINI_UART_RX_PIN, PSP_GPIO_PINMODE_ALT5);
+
+    // enable the mini uart
+    BSP_AUX_ENABLES_R |= AUX_MINI_UART_ENABLE;
+
+    // disable mini uart interrupts
+    BSP_AUX_MU_IER_REG_R = 0u;
+
+    // zero out the control register
+    BSP_AUX_MU_CNTL_REG_R = 0u;
+
+    // enable 8 bit mode
+    BSP_AUX_MU_LCR_REG_R = AUX_MU_LCR_8_BIT_MODE;
+
+    // set RTS line to be high
+    BSP_AUX_MU_MCR_REG_R = 0;
+
+    // set the baud rate
+    BSP_AUX_Mini_Uart_Set_Baud_Rate(baud_rate_enum);
+
+    // enable transmitter and reciever
+    BSP_AUX_MU_CNTL_REG_R |= AUX_MU_CNTL_TRANSMITTER_ENABLE | AUX_MU_CNTL_RECIEVER_ENABLE;
+}
+
+
+
+void BSP_AUX_Mini_Uart_Set_Baud_Rate(BSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
+{
+    BSP_AUX_MU_BAUD_REG_R = baud_rate_enum;
+}
+
+
+
+void BSP_AUX_Mini_Uart_Send_Byte(uint8_t value)
+{
+    while (!(BSP_AUX_MU_LSR_REG_R & AUX_MU_LSR_TRANSMITTER_EMPTY))
+    {
+        // wait until the transmitter can accept data
+    }
+
+    // write the value to the I/O register
+    BSP_AUX_MU_IO_REG_R = value;
+}
+
+
+
+void BSP_AUX_Mini_Uart_Send_String(char * c_string)
+{
+    
+    for (int i = 0u; c_string[i] != '\0'; i++)
+    {
+        BSP_AUX_Mini_Uart_Send_Byte(c_string[i]);
+    }
+}
