@@ -1,32 +1,32 @@
 
-#include "BSP_I2C.h"
+#include "PSP_I2C.h"
 #include "PSP_GPIO.h"
 #include "PSP_REGS.h"
 
 /*-----------------------------------------------------------------------------------------------
-    Private BSP_I2C Defines
+    Private PSP_I2C Defines
  -------------------------------------------------------------------------------------------------*/
 
 // I2C Register Addresses
-#define BSP_I2C_BASE_A     (PSP_REGS_I2C_BASE_ADDRESS)
-#define BSP_I2C_C_A        (BSP_I2C_BASE_A | 0x00000000u)           // control register address
-#define BSP_I2C_S_A        (BSP_I2C_BASE_A | 0x00000004u)           // status register address
-#define BSP_I2C_DLEN_A     (BSP_I2C_BASE_A | 0x00000008u)           // data length register address
-#define BSP_I2C_SA_A       (BSP_I2C_BASE_A | 0x0000000Cu)           // slave address register address
-#define BSP_I2C_FIFO_A     (BSP_I2C_BASE_A | 0x00000010u)           // data FIFO register address
-#define BSP_I2C_DIV_A      (BSP_I2C_BASE_A | 0x00000014u)           // clock divider register address
-#define BSP_I2C_DEL_A      (BSP_I2C_BASE_A | 0x00000018u)           // data delay register address
-#define BSP_I2C_CLKT_A     (BSP_I2C_BASE_A | 0x0000001Cu)           // clock stretch timeout register address
+#define PSP_I2C_BASE_A     (PSP_REGS_I2C_BASE_ADDRESS)
+#define PSP_I2C_C_A        (PSP_I2C_BASE_A | 0x00000000u)           // control register address
+#define PSP_I2C_S_A        (PSP_I2C_BASE_A | 0x00000004u)           // status register address
+#define PSP_I2C_DLEN_A     (PSP_I2C_BASE_A | 0x00000008u)           // data length register address
+#define PSP_I2C_SA_A       (PSP_I2C_BASE_A | 0x0000000Cu)           // slave address register address
+#define PSP_I2C_FIFO_A     (PSP_I2C_BASE_A | 0x00000010u)           // data FIFO register address
+#define PSP_I2C_DIV_A      (PSP_I2C_BASE_A | 0x00000014u)           // clock divider register address
+#define PSP_I2C_DEL_A      (PSP_I2C_BASE_A | 0x00000018u)           // data delay register address
+#define PSP_I2C_CLKT_A     (PSP_I2C_BASE_A | 0x0000001Cu)           // clock stretch timeout register address
 
 // I2C Register Pointers
-#define BSP_I2C_C_R        (*((volatile uint32_t *)BSP_I2C_C_A))    // control register
-#define BSP_I2C_S_R        (*((volatile uint32_t *)BSP_I2C_S_A))    // status register
-#define BSP_I2C_DLEN_R     (*((volatile uint32_t *)BSP_I2C_DLEN_A)) // data length register
-#define BSP_I2C_SA_R       (*((volatile uint32_t *)BSP_I2C_SA_A))   // slave address register
-#define BSP_I2C_FIFO_R     (*((volatile uint32_t *)BSP_I2C_FIFO_A)) // data FIFO register
-#define BSP_I2C_DIV_R      (*((volatile uint32_t *)BSP_I2C_DIV_A))  // clock divider register
-#define BSP_I2C_DEL_R      (*((volatile uint32_t *)BSP_I2C_DEL_A))  // data delay register
-#define BSP_I2C_CLKT_R     (*((volatile uint32_t *)BSP_I2C_CLKT_A)) // clock stretch timeout register
+#define PSP_I2C_C_R        (*((volatile uint32_t *)PSP_I2C_C_A))    // control register
+#define PSP_I2C_S_R        (*((volatile uint32_t *)PSP_I2C_S_A))    // status register
+#define PSP_I2C_DLEN_R     (*((volatile uint32_t *)PSP_I2C_DLEN_A)) // data length register
+#define PSP_I2C_SA_R       (*((volatile uint32_t *)PSP_I2C_SA_A))   // slave address register
+#define PSP_I2C_FIFO_R     (*((volatile uint32_t *)PSP_I2C_FIFO_A)) // data FIFO register
+#define PSP_I2C_DIV_R      (*((volatile uint32_t *)PSP_I2C_DIV_A))  // clock divider register
+#define PSP_I2C_DEL_R      (*((volatile uint32_t *)PSP_I2C_DEL_A))  // data delay register
+#define PSP_I2C_CLKT_R     (*((volatile uint32_t *)PSP_I2C_CLKT_A)) // clock stretch timeout register
 
 // masks for I2C control register
 #define I2C_C_I2CEN        0x00008000u // I2C Enable, 0 = disabled, 1 = enabled
@@ -53,11 +53,11 @@
 
 
 /*-----------------------------------------------------------------------------------------------
-    BSP_I2C Function Definitions
+    PSP_I2C Function Definitions
  -------------------------------------------------------------------------------------------------*/
 
 
-void BSP_I2C_Start(void)
+void PSP_I2C_Start(void)
 {
     PSP_GPIO_Set_Pin_Mode(I2C_SDA_PIN, PSP_GPIO_PINMODE_ALT0);
     PSP_GPIO_Set_Pin_Mode(I2C_SCL_PIN, PSP_GPIO_PINMODE_ALT0);
@@ -65,7 +65,7 @@ void BSP_I2C_Start(void)
 
 
 
- void BSP_I2C_End(void)
+ void PSP_I2C_End(void)
  {
     PSP_GPIO_Set_Pin_Mode(I2C_SDA_PIN, PSP_GPIO_PINMODE_INPUT);
     PSP_GPIO_Set_Pin_Mode(I2C_SCL_PIN, PSP_GPIO_PINMODE_INPUT);
@@ -73,43 +73,43 @@ void BSP_I2C_Start(void)
 
 
 
-void BSP_I2C_Set_Clock_Divider(uint32_t divider)
+void PSP_I2C_Set_Clock_Divider(uint32_t divider)
 {
-    BSP_I2C_DIV_R = divider;
+    PSP_I2C_DIV_R = divider;
 }
 
 
 
-void BSP_I2C_Set_Slave_Address(uint32_t address)
+void PSP_I2C_Set_Slave_Address(uint32_t address)
 {
-    BSP_I2C_SA_R = address;
+    PSP_I2C_SA_R = address;
 }
 
 
 
-void BSP_I2C_Write_Byte(uint8_t val)
+void PSP_I2C_Write_Byte(uint8_t val)
 {
     // clear the fifo
-    BSP_I2C_C_R |= I2C_C_CLEAR_1;
+    PSP_I2C_C_R |= I2C_C_CLEAR_1;
 
     // clear the clock stretch timeout, no acknowledge error, and transfer done status flags 
     // note that these flags are cleared by writing a 1
-    BSP_I2C_S_R |= I2C_S_CLKT | I2C_S_ERR | I2C_S_DONE;
+    PSP_I2C_S_R |= I2C_S_CLKT | I2C_S_ERR | I2C_S_DONE;
     
     // set data length to 1 byte
-    BSP_I2C_DLEN_R = 1u;
+    PSP_I2C_DLEN_R = 1u;
 
     // write the value to the fifo
-    BSP_I2C_FIFO_R = val;
+    PSP_I2C_FIFO_R = val;
     
     // enable device and start transfer
-    BSP_I2C_C_R |= I2C_C_I2CEN | I2C_C_ST;
+    PSP_I2C_C_R |= I2C_C_I2CEN | I2C_C_ST;
 
-    while (!(BSP_I2C_S_R & I2C_S_DONE))
+    while (!(PSP_I2C_S_R & I2C_S_DONE))
     {
         // wait for transfer to complete
     }
 
     // set the done flag inorder to clear it and end the transfer
-    BSP_I2C_S_R |= I2C_S_DONE;
+    PSP_I2C_S_R |= I2C_S_DONE;
 }

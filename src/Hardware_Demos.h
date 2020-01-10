@@ -20,10 +20,10 @@
 
 #include "PSP_GPIO.h"
 #include "PSP_Time.h"
-#include "BSP_PWM.h"
-#include "BSP_SPI_0.h"
-#include "BSP_I2C.h"
-#include "BSP_Aux_Mini_UART.h"
+#include "PSP_PWM.h"
+#include "PSP_SPI_0.h"
+#include "PSP_I2C.h"
+#include "PSP_Aux_Mini_UART.h"
 
 
 
@@ -69,18 +69,18 @@ void demo_PWM()
 {
     const uint32_t DELAY_TIME_uSec = 1000u;
 
-    BSP_PWM_Clock_Init(BSP_PWM_Clock_Source_OSCILLATOR, PWM_DEFAULT_DIV);
-    BSP_PWM_Channel_Start(BSP_PWM_Channel_1, BSP_PWM_MARK_SPACE_MODE, BSP_PWM_RANGE_10_BITS);
-    BSP_PWM_Ch1_Set_GPIO12_To_PWM_Mode();
+    PSP_PWM_Clock_Init(PSP_PWM_Clock_Source_OSCILLATOR, PWM_DEFAULT_DIV);
+    PSP_PWM_Channel_Start(PSP_PWM_Channel_1, PSP_PWM_MARK_SPACE_MODE, PSP_PWM_RANGE_10_BITS);
+    PSP_PWM_Ch1_Set_GPIO12_To_PWM_Mode();
 
     uint32_t pwm_val = 0u;
 
     while(1)
     {
         // write a ramp wave via PWM
-        BSP_PWM_Ch1_Write(pwm_val);
+        PSP_PWM_Ch1_Write(pwm_val);
         pwm_val++;
-        pwm_val %= BSP_PWM_RANGE_10_BITS;
+        pwm_val %= PSP_PWM_RANGE_10_BITS;
 
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
     }
@@ -103,9 +103,9 @@ void demo_SPI_0()
 {
     const uint32_t DELAY_TIME_uSec = 1000u;
 
-    BSP_SPI0_Start();
-    BSP_SPI0_Set_Clock_Divider(BSP_SPI0_Clock_Divider_1024);
-    BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_0);
+    PSP_SPI0_Start();
+    PSP_SPI0_Set_Clock_Divider(PSP_SPI0_Clock_Divider_1024);
+    PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_0);
 
     const uint32_t SPI_BUFFER_SIZE = 5u;
 
@@ -120,7 +120,7 @@ void demo_SPI_0()
 
     while(1)
     {
-        BSP_SPI0_Buffer_Transfer(spi_data_out, spi_data_in, SPI_BUFFER_SIZE);
+        PSP_SPI0_Buffer_Transfer(spi_data_out, spi_data_in, SPI_BUFFER_SIZE);
         
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
     }
@@ -145,16 +145,16 @@ void demo_I2C()
 
     const uint32_t SLAVE_ADDRESS = 0x27u;
 
-    BSP_I2C_Start();
+    PSP_I2C_Start();
     // use default divider for ~100kHz clock speed
-    BSP_I2C_Set_Slave_Address(SLAVE_ADDRESS);
+    PSP_I2C_Set_Slave_Address(SLAVE_ADDRESS);
 
     while (1)
     {
-        BSP_I2C_Write_Byte(0xFEu);
-        BSP_I2C_Write_Byte(0xEDu);
-        BSP_I2C_Write_Byte(0xFAu);
-        BSP_I2C_Write_Byte(0xCEu);
+        PSP_I2C_Write_Byte(0xFEu);
+        PSP_I2C_Write_Byte(0xEDu);
+        PSP_I2C_Write_Byte(0xFAu);
+        PSP_I2C_Write_Byte(0xCEu);
 
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);    
     }
@@ -174,11 +174,11 @@ void demo_Mini_Uart()
 {
     const uint32_t DELAY_TIME_uSec = 10000u;
 
-    BSP_AUX_Mini_Uart_Init(BSP_AUX_Mini_Uart_Baud_Rate_9600);
+    PSP_AUX_Mini_Uart_Init(PSP_AUX_Mini_Uart_Baud_Rate_9600);
 
     while (1)
     {
-        BSP_AUX_Mini_Uart_Send_String("quux");
+        PSP_AUX_Mini_Uart_Send_String("quux");
 
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec); 
     }

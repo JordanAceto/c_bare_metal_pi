@@ -1,6 +1,6 @@
 /**
  * DESCRIPTION:
- *      BSP_I2C provides an interface for using I2C.
+ *      PSP_I2C provides an interface for using I2C.
  * 
  * NOTES:
  *      TODO: Writing data has been tested, but reading data has not. To do so,
@@ -13,13 +13,13 @@
  *      BCM2837-ARM-Peripherals.pdf page 28
  */
 
-#ifndef BSP_I2C_H_INCLUDED
-#define BSP_I2C_H_INCLUDED
+#ifndef PSP_I2C_H_INCLUDED
+#define PSP_I2C_H_INCLUDED
 
 #include "Fixed_Width_Ints.h"
 
 /*-----------------------------------------------------------------------------------------------
-    Public BSP_I2C Defines
+    Public PSP_I2C Defines
  -------------------------------------------------------------------------------------------------*/
 
 // pin constants for I2C
@@ -29,14 +29,14 @@
 
 
 /*-----------------------------------------------------------------------------------------------
-    Public BSP_I2C Function Declarations
+    Public PSP_I2C Function Declarations
  -------------------------------------------------------------------------------------------------*/
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_I2C_Start
+    PSP_I2C_Start
 
 Function Description:
     Initialize I2C by setting GPIO pins 2 and 3 to alt mode 0.
@@ -51,14 +51,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_I2C_Start(void);
+void PSP_I2C_Start(void);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_I2C_End
+    PSP_I2C_End
 
 Function Description:
     Shut down I2C by setting GPIO pins 2 and 3 to inputs.
@@ -73,14 +73,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_I2C_End(void);
+void PSP_I2C_End(void);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_I2C_Set_Clock_Divider
+    PSP_I2C_Set_Clock_Divider
 
 Function Description:
     Sets the clock divider for I2C. This sets the clock speed.
@@ -99,14 +99,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_I2C_Set_Clock_Divider(uint32_t divider);
+void PSP_I2C_Set_Clock_Divider(uint32_t divider);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_I2C_Set_Slave_Address
+    PSP_I2C_Set_Slave_Address
 
 Function Description:
     Sets the I2C slave device address.
@@ -121,14 +121,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_I2C_Set_Slave_Address(uint32_t address);
+void PSP_I2C_Set_Slave_Address(uint32_t address);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_I2C_Write_Byte
+    PSP_I2C_Write_Byte
 
 Function Description:
     Writes a single byte to the address in the I2C address register.
@@ -143,7 +143,7 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_I2C_Write_Byte(uint8_t val);
+void PSP_I2C_Write_Byte(uint8_t val);
 
 
 

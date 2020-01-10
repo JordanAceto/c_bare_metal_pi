@@ -1,6 +1,6 @@
 /**
  * DESCRIPTION:
- *      BSP_SPI_0 provides an interface for using SPI 0.
+ *      PSP_SPI_0 provides an interface for using SPI 0.
  * 
  * NOTES:
  *      TODO: Writing data has been tested, but reading data has not. To do so,
@@ -18,59 +18,59 @@
 
 
 /*-----------------------------------------------------------------------------------------------
-    Public BSP_SPI_0 Defines
+    Public PSP_SPI_0 Defines
  -------------------------------------------------------------------------------------------------*/
 
 // SPI 0 GPIO pin numbers
-#define BSP_SPI_0_CE1_PIN   7u
-#define BSP_SPI_0_CE0_PIN   8u
-#define BSP_SPI_0_MISO_PIN  9u
-#define BSP_SPI_0_MOSI_PIN  10u
-#define BSP_SPI_0_CLK_PIN   11u
+#define PSP_SPI_0_CE1_PIN   7u
+#define PSP_SPI_0_CE0_PIN   8u
+#define PSP_SPI_0_MISO_PIN  9u
+#define PSP_SPI_0_MOSI_PIN  10u
+#define PSP_SPI_0_CLK_PIN   11u
 
 
 
 /*------------------------------------------------------------------------------------------------
-    Public BSP_SPI_0 Types
+    Public PSP_SPI_0 Types
  -------------------------------------------------------------------------------------------------*/
 
 typedef enum SPI_0_Clock_Divider_Type
 {
-    BSP_SPI0_Clock_Divider_2     =     2u, // sets SPI 0 clock to 125.0 MHz
-    BSP_SPI0_Clock_Divider_4     =     4u, // sets SPI 0 clock to 62.5 MHz
-    BSP_SPI0_Clock_Divider_8     =     8u, // sets SPI 0 clock to 31.2 MHz
-    BSP_SPI0_Clock_Divider_16    =    16u, // sets SPI 0 clock to 15.6 MHz
-    BSP_SPI0_Clock_Divider_32    =    32u, // sets SPI 0 clock to 7.8 MHz
-    BSP_SPI0_Clock_Divider_64    =    64u, // sets SPI 0 clock to 3.9 MHz
-    BSP_SPI0_Clock_Divider_128   =   128u, // sets SPI 0 clock to 1953 kHz
-    BSP_SPI0_Clock_Divider_256   =   256u, // sets SPI 0 clock to 976 kHz
-    BSP_SPI0_Clock_Divider_512   =   512u, // sets SPI 0 clock to 488 kHz
-    BSP_SPI0_Clock_Divider_1024  =  1024u, // sets SPI 0 clock to 244 kHz
-    BSP_SPI0_Clock_Divider_2048  =  2048u, // sets SPI 0 clock to 122 kHz
-    BSP_SPI0_Clock_Divider_4096  =  4096u, // sets SPI 0 clock to 61 kHz
-    BSP_SPI0_Clock_Divider_8192  =  8192u, // sets SPI 0 clock to 30.5 kHz
-    BSP_SPI0_Clock_Divider_16384 = 16384u, // sets SPI 0 clock to 15.2 kHz
-    BSP_SPI0_Clock_Divider_32768 = 32768u  // sets SPI 0 clock to 7629 Hz
-} BSP_SPI_0_Clock_Divider_t;
+    PSP_SPI0_Clock_Divider_2     =     2u, // sets SPI 0 clock to 125.0 MHz
+    PSP_SPI0_Clock_Divider_4     =     4u, // sets SPI 0 clock to 62.5 MHz
+    PSP_SPI0_Clock_Divider_8     =     8u, // sets SPI 0 clock to 31.2 MHz
+    PSP_SPI0_Clock_Divider_16    =    16u, // sets SPI 0 clock to 15.6 MHz
+    PSP_SPI0_Clock_Divider_32    =    32u, // sets SPI 0 clock to 7.8 MHz
+    PSP_SPI0_Clock_Divider_64    =    64u, // sets SPI 0 clock to 3.9 MHz
+    PSP_SPI0_Clock_Divider_128   =   128u, // sets SPI 0 clock to 1953 kHz
+    PSP_SPI0_Clock_Divider_256   =   256u, // sets SPI 0 clock to 976 kHz
+    PSP_SPI0_Clock_Divider_512   =   512u, // sets SPI 0 clock to 488 kHz
+    PSP_SPI0_Clock_Divider_1024  =  1024u, // sets SPI 0 clock to 244 kHz
+    PSP_SPI0_Clock_Divider_2048  =  2048u, // sets SPI 0 clock to 122 kHz
+    PSP_SPI0_Clock_Divider_4096  =  4096u, // sets SPI 0 clock to 61 kHz
+    PSP_SPI0_Clock_Divider_8192  =  8192u, // sets SPI 0 clock to 30.5 kHz
+    PSP_SPI0_Clock_Divider_16384 = 16384u, // sets SPI 0 clock to 15.2 kHz
+    PSP_SPI0_Clock_Divider_32768 = 32768u  // sets SPI 0 clock to 7629 Hz
+} PSP_SPI_0_Clock_Divider_t;
 
 
 typedef enum SPI_0_Chip_Select_Type
 {
-    BSP_SPI_0_Chip_Select_0 = 0u,
-    BSP_SPI_0_Chip_Select_1 = 1u
-} BSP_SPI_0_Chip_Select_t;
+    PSP_SPI_0_Chip_Select_0 = 0u,
+    PSP_SPI_0_Chip_Select_1 = 1u
+} PSP_SPI_0_Chip_Select_t;
 
 
 
 /*-----------------------------------------------------------------------------------------------
-    Public BSP_SPI_0 Function Declarations
+    Public PSP_SPI_0 Function Declarations
  -------------------------------------------------------------------------------------------------*/
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_Start
+    PSP_SPI0_Start
 
 Function Description:
     Initialize SPI0 by setting GPIO pins 7 through 11 to alt mode 0, zeroing the SPI0 status
@@ -87,14 +87,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_SPI0_Start(void);
+void PSP_SPI0_Start(void);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_End
+    PSP_SPI0_End
 
 Function Description:
     Shuts down SPI0 by setting GPIO pins 7 through 11 to inputs.
@@ -109,7 +109,7 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_SPI0_End(void);
+void PSP_SPI0_End(void);
 
 
 
@@ -117,7 +117,7 @@ void BSP_SPI0_End(void);
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_Set_Clock_Divider
+    PSP_SPI0_Set_Clock_Divider
 
 Function Description:
     Sets the clock divider for SPI0. This sets the speed for the SPI0 clock.
@@ -155,14 +155,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_SPI0_Set_Clock_Divider(BSP_SPI_0_Clock_Divider_t divider);
+void PSP_SPI0_Set_Clock_Divider(PSP_SPI_0_Clock_Divider_t divider);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_Transfer_Byte
+    PSP_SPI0_Transfer_Byte
 
 Function Description:
     Write and read a single byte via SPI 0. Uses Polled transfer as described in section 10.6.1 of the datasheet.
@@ -177,14 +177,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-uint8_t BSP_SPI0_Transfer_Byte(uint8_t val);
+uint8_t PSP_SPI0_Transfer_Byte(uint8_t val);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_Transfer_16
+    PSP_SPI0_Transfer_16
 
 Function Description:
     Write and read a 16 bit word via SPI 0. Uses Polled transfer as described in section 10.6.1 of the datasheet.
@@ -199,14 +199,14 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-uint16_t BSP_SPI0_Transfer_16(uint16_t val);
+uint16_t PSP_SPI0_Transfer_16(uint16_t val);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_Buffer_Transfer
+    PSP_SPI0_Buffer_Transfer
 
 Function Description:
     Write and read a given number of bytes via Tx and Rx buffers
@@ -224,14 +224,14 @@ Error Handling:
     None, note that the Tx and Rx buffers MUST both be at least num_bytes long.
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32_t num_bytes);
+void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32_t num_bytes);
 
 
 
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
-    BSP_SPI0_Set_Chip_Select
+    PSP_SPI0_Set_Chip_Select
 
 Function Description:
     Choose which chip select line to assert when transferring data.
@@ -247,7 +247,7 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void BSP_SPI0_Set_Chip_Select(BSP_SPI_0_Chip_Select_t chip_select);
+void PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_t chip_select);
 
 
 

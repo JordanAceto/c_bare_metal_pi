@@ -1,45 +1,45 @@
 
-#include "BSP_Aux_Mini_UART.h"
+#include "PSP_Aux_Mini_UART.h"
 #include "PSP_REGS.h"
 #include "PSP_GPIO.h"
 
 /*------------------------------------------------------------------------------------------------
-    Private BSP_Aux_Mini_UART Defines
+    Private PSP_Aux_Mini_UART Defines
  -------------------------------------------------------------------------------------------------*/
 
 // AUX Register Addresses
-#define BSP_AUX_BASE_ADDRESS      (PSP_REGS_AUX_BASE_ADDRESS)
+#define PSP_AUX_BASE_ADDRESS      (PSP_REGS_AUX_BASE_ADDRESS)
 
-#define BSP_AUX_IRQ_A             (BSP_AUX_BASE_ADDRESS | 0x00000000u) // Auxiliary Interrupt status address
-#define BSP_AUX_ENABLES_A         (BSP_AUX_BASE_ADDRESS | 0x00000004u) // Auxiliary enables address
+#define PSP_AUX_IRQ_A             (PSP_AUX_BASE_ADDRESS | 0x00000000u) // Auxiliary Interrupt status address
+#define PSP_AUX_ENABLES_A         (PSP_AUX_BASE_ADDRESS | 0x00000004u) // Auxiliary enables address
 
-#define BSP_AUX_MU_IO_REG_A       (BSP_AUX_BASE_ADDRESS | 0x00000040u) // Mini Uart I/O Data address
-#define BSP_AUX_MU_IER_REG_A      (BSP_AUX_BASE_ADDRESS | 0x00000044u) // Mini Uart Interrupt Enable address
-#define BSP_AUX_MU_IIR_REG_A      (BSP_AUX_BASE_ADDRESS | 0x00000048u) // Mini Uart Interrupt Identify address
-#define BSP_AUX_MU_LCR_REG_A      (BSP_AUX_BASE_ADDRESS | 0x0000004Cu) // Mini Uart Line Control address
-#define BSP_AUX_MU_MCR_REG_A      (BSP_AUX_BASE_ADDRESS | 0x00000050u) // Mini Uart Modem Control address
-#define BSP_AUX_MU_LSR_REG_A      (BSP_AUX_BASE_ADDRESS | 0x00000054u) // Mini Uart Line Status address
-#define BSP_AUX_MU_MSR_REG_A      (BSP_AUX_BASE_ADDRESS | 0x00000058u) // Mini Uart Modem Status address
-#define BSP_AUX_MU_SCRATCH_A      (BSP_AUX_BASE_ADDRESS | 0x0000005Cu) // Mini Uart Scratch address
-#define BSP_AUX_MU_CNTL_REG_A     (BSP_AUX_BASE_ADDRESS | 0x00000060u) // Mini Uart Extra Control address
-#define BSP_AUX_MU_STAT_REG_A     (BSP_AUX_BASE_ADDRESS | 0x00000064u) // Mini Uart Extra Status address
-#define BSP_AUX_MU_BAUD_REG_A     (BSP_AUX_BASE_ADDRESS | 0x00000068u) // Mini Uart Baudrate address
+#define PSP_AUX_MU_IO_REG_A       (PSP_AUX_BASE_ADDRESS | 0x00000040u) // Mini Uart I/O Data address
+#define PSP_AUX_MU_IER_REG_A      (PSP_AUX_BASE_ADDRESS | 0x00000044u) // Mini Uart Interrupt Enable address
+#define PSP_AUX_MU_IIR_REG_A      (PSP_AUX_BASE_ADDRESS | 0x00000048u) // Mini Uart Interrupt Identify address
+#define PSP_AUX_MU_LCR_REG_A      (PSP_AUX_BASE_ADDRESS | 0x0000004Cu) // Mini Uart Line Control address
+#define PSP_AUX_MU_MCR_REG_A      (PSP_AUX_BASE_ADDRESS | 0x00000050u) // Mini Uart Modem Control address
+#define PSP_AUX_MU_LSR_REG_A      (PSP_AUX_BASE_ADDRESS | 0x00000054u) // Mini Uart Line Status address
+#define PSP_AUX_MU_MSR_REG_A      (PSP_AUX_BASE_ADDRESS | 0x00000058u) // Mini Uart Modem Status address
+#define PSP_AUX_MU_SCRATCH_A      (PSP_AUX_BASE_ADDRESS | 0x0000005Cu) // Mini Uart Scratch address
+#define PSP_AUX_MU_CNTL_REG_A     (PSP_AUX_BASE_ADDRESS | 0x00000060u) // Mini Uart Extra Control address
+#define PSP_AUX_MU_STAT_REG_A     (PSP_AUX_BASE_ADDRESS | 0x00000064u) // Mini Uart Extra Status address
+#define PSP_AUX_MU_BAUD_REG_A     (PSP_AUX_BASE_ADDRESS | 0x00000068u) // Mini Uart Baudrate address
 
 // AUX Register Pointers
-#define BSP_AUX_IRQ_R             (*((volatile uint32_t *)BSP_AUX_IRQ_A))             // Auxiliary Interrupt status register
-#define BSP_AUX_ENABLES_R         (*((volatile uint32_t *)BSP_AUX_ENABLES_A))         // Auxiliary enables register
+#define PSP_AUX_IRQ_R             (*((volatile uint32_t *)PSP_AUX_IRQ_A))             // Auxiliary Interrupt status register
+#define PSP_AUX_ENABLES_R         (*((volatile uint32_t *)PSP_AUX_ENABLES_A))         // Auxiliary enables register
 
-#define BSP_AUX_MU_IO_REG_R       (*((volatile uint32_t *)BSP_AUX_MU_IO_REG_A))       // Mini Uart I/O Data register
-#define BSP_AUX_MU_IER_REG_R      (*((volatile uint32_t *)BSP_AUX_MU_IER_REG_A))      // Mini Uart Interrupt Enable register
-#define BSP_AUX_MU_IIR_REG_R      (*((volatile uint32_t *)BSP_AUX_MU_IIR_REG_A))      // Mini Uart Interrupt Identify register
-#define BSP_AUX_MU_LCR_REG_R      (*((volatile uint32_t *)BSP_AUX_MU_LCR_REG_A))      // Mini Uart Line Control register
-#define BSP_AUX_MU_MCR_REG_R      (*((volatile uint32_t *)BSP_AUX_MU_MCR_REG_A))      // Mini Uart Modem Control register
-#define BSP_AUX_MU_LSR_REG_R      (*((volatile uint32_t *)BSP_AUX_MU_LSR_REG_A))      // Mini Uart Line Status register
-#define BSP_AUX_MU_MSR_REG_R      (*((volatile uint32_t *)BSP_AUX_MU_MSR_REG_A))      // Mini Uart Modem Status register
-#define BSP_AUX_MU_SCRATCH_R      (*((volatile uint32_t *)BSP_AUX_MU_SCRATCH_A))      // Mini Uart Scratch register
-#define BSP_AUX_MU_CNTL_REG_R     (*((volatile uint32_t *)BSP_AUX_MU_CNTL_REG_A))     // Mini Uart Extra Control register
-#define BSP_AUX_MU_STAT_REG_R     (*((volatile uint32_t *)BSP_AUX_MU_STAT_REG_A))     // Mini Uart Extra Status register
-#define BSP_AUX_MU_BAUD_REG_R     (*((volatile uint32_t *)BSP_AUX_MU_BAUD_REG_A))     // Mini Uart Baudrate register
+#define PSP_AUX_MU_IO_REG_R       (*((volatile uint32_t *)PSP_AUX_MU_IO_REG_A))       // Mini Uart I/O Data register
+#define PSP_AUX_MU_IER_REG_R      (*((volatile uint32_t *)PSP_AUX_MU_IER_REG_A))      // Mini Uart Interrupt Enable register
+#define PSP_AUX_MU_IIR_REG_R      (*((volatile uint32_t *)PSP_AUX_MU_IIR_REG_A))      // Mini Uart Interrupt Identify register
+#define PSP_AUX_MU_LCR_REG_R      (*((volatile uint32_t *)PSP_AUX_MU_LCR_REG_A))      // Mini Uart Line Control register
+#define PSP_AUX_MU_MCR_REG_R      (*((volatile uint32_t *)PSP_AUX_MU_MCR_REG_A))      // Mini Uart Modem Control register
+#define PSP_AUX_MU_LSR_REG_R      (*((volatile uint32_t *)PSP_AUX_MU_LSR_REG_A))      // Mini Uart Line Status register
+#define PSP_AUX_MU_MSR_REG_R      (*((volatile uint32_t *)PSP_AUX_MU_MSR_REG_A))      // Mini Uart Modem Status register
+#define PSP_AUX_MU_SCRATCH_R      (*((volatile uint32_t *)PSP_AUX_MU_SCRATCH_A))      // Mini Uart Scratch register
+#define PSP_AUX_MU_CNTL_REG_R     (*((volatile uint32_t *)PSP_AUX_MU_CNTL_REG_A))     // Mini Uart Extra Control register
+#define PSP_AUX_MU_STAT_REG_R     (*((volatile uint32_t *)PSP_AUX_MU_STAT_REG_A))     // Mini Uart Extra Status register
+#define PSP_AUX_MU_BAUD_REG_R     (*((volatile uint32_t *)PSP_AUX_MU_BAUD_REG_A))     // Mini Uart Baudrate register
 
 // AUX IRQ Register Masks
 #define AUX_MINI_UART_IRQ    0b001u // If set the mini UART has an interrupt pending
@@ -98,64 +98,64 @@
 
 
 /*-----------------------------------------------------------------------------------------------
-    BSP_Aux_Mini_UART Function Definitions
+    PSP_Aux_Mini_UART Function Definitions
  -------------------------------------------------------------------------------------------------*/
 
-void BSP_AUX_Mini_Uart_Init(BSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
+void PSP_AUX_Mini_Uart_Init(PSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
 {
     // set pins 14 and 15 to alt pin mode 5 for mini uart
-    PSP_GPIO_Set_Pin_Mode(BSP_AUX_MINI_UART_TX_PIN, PSP_GPIO_PINMODE_ALT5);
-    PSP_GPIO_Set_Pin_Mode(BSP_AUX_MINI_UART_RX_PIN, PSP_GPIO_PINMODE_ALT5);
+    PSP_GPIO_Set_Pin_Mode(PSP_AUX_MINI_UART_TX_PIN, PSP_GPIO_PINMODE_ALT5);
+    PSP_GPIO_Set_Pin_Mode(PSP_AUX_MINI_UART_RX_PIN, PSP_GPIO_PINMODE_ALT5);
 
     // enable the mini uart
-    BSP_AUX_ENABLES_R |= AUX_MINI_UART_ENABLE;
+    PSP_AUX_ENABLES_R |= AUX_MINI_UART_ENABLE;
 
     // disable mini uart interrupts
-    BSP_AUX_MU_IER_REG_R = 0u;
+    PSP_AUX_MU_IER_REG_R = 0u;
 
     // zero out the control register
-    BSP_AUX_MU_CNTL_REG_R = 0u;
+    PSP_AUX_MU_CNTL_REG_R = 0u;
 
     // enable 8 bit mode
-    BSP_AUX_MU_LCR_REG_R = AUX_MU_LCR_8_BIT_MODE;
+    PSP_AUX_MU_LCR_REG_R = AUX_MU_LCR_8_BIT_MODE;
 
     // set RTS line to be high
-    BSP_AUX_MU_MCR_REG_R = 0;
+    PSP_AUX_MU_MCR_REG_R = 0;
 
     // set the baud rate
-    BSP_AUX_Mini_Uart_Set_Baud_Rate(baud_rate_enum);
+    PSP_AUX_Mini_Uart_Set_Baud_Rate(baud_rate_enum);
 
     // enable transmitter and reciever
-    BSP_AUX_MU_CNTL_REG_R |= AUX_MU_CNTL_TRANSMITTER_ENABLE | AUX_MU_CNTL_RECIEVER_ENABLE;
+    PSP_AUX_MU_CNTL_REG_R |= AUX_MU_CNTL_TRANSMITTER_ENABLE | AUX_MU_CNTL_RECIEVER_ENABLE;
 }
 
 
 
-void BSP_AUX_Mini_Uart_Set_Baud_Rate(BSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
+void PSP_AUX_Mini_Uart_Set_Baud_Rate(PSP_AUX_Mini_Uart_Baud_Rate_t baud_rate_enum)
 {
-    BSP_AUX_MU_BAUD_REG_R = baud_rate_enum;
+    PSP_AUX_MU_BAUD_REG_R = baud_rate_enum;
 }
 
 
 
-void BSP_AUX_Mini_Uart_Send_Byte(uint8_t value)
+void PSP_AUX_Mini_Uart_Send_Byte(uint8_t value)
 {
-    while (!(BSP_AUX_MU_LSR_REG_R & AUX_MU_LSR_TRANSMITTER_EMPTY))
+    while (!(PSP_AUX_MU_LSR_REG_R & AUX_MU_LSR_TRANSMITTER_EMPTY))
     {
         // wait until the transmitter can accept data
     }
 
     // write the value to the I/O register
-    BSP_AUX_MU_IO_REG_R = value;
+    PSP_AUX_MU_IO_REG_R = value;
 }
 
 
 
-void BSP_AUX_Mini_Uart_Send_String(char * c_string)
+void PSP_AUX_Mini_Uart_Send_String(char * c_string)
 {
     
     for (int i = 0u; c_string[i] != '\0'; i++)
     {
-        BSP_AUX_Mini_Uart_Send_Byte(c_string[i]);
+        PSP_AUX_Mini_Uart_Send_Byte(c_string[i]);
     }
 }
