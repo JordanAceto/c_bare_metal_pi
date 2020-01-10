@@ -31,7 +31,7 @@
     Public BSP_PWM Types
  -------------------------------------------------------------------------------------------------*/
  
-typedef enum
+typedef enum PWM_Clock_Source_Type
 {
     BSP_PWM_Clock_Source_GND = 0u,        // clock off
     BSP_PWM_Clock_Source_OSCILLATOR = 1u, // internal oscillator runs at 19.2MHz
@@ -43,7 +43,7 @@ typedef enum
 
 
 
-typedef enum
+typedef enum PWM_Channel_Type
 {
     BSP_PWM_Channel_1,
     BSP_PWM_Channel_2
@@ -51,7 +51,7 @@ typedef enum
 
 
 
-typedef enum
+typedef enum PWM_Output_Mode_Type
 {
     BSP_PWM_N_OVER_M_MODE = 0u,   // use the N/M mode
     BSP_PWM_MARK_SPACE_MODE = 1u  // use the M/S mode
@@ -59,7 +59,7 @@ typedef enum
 
 
 
-typedef enum
+typedef enum PWM_Range_Type
 {
     BSP_PWM_RANGE_8_BITS  =  0x100u, // [0, 255]
     BSP_PWM_RANGE_10_BITS =  0x400u, // [0, 1023]

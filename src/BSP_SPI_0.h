@@ -34,7 +34,7 @@
     Public BSP_SPI_0 Types
  -------------------------------------------------------------------------------------------------*/
 
-typedef enum
+typedef enum SPI_0_Clock_Divider_Type
 {
     BSP_SPI0_Clock_Divider_2     =     2u, // sets SPI 0 clock to 125.0 MHz
     BSP_SPI0_Clock_Divider_4     =     4u, // sets SPI 0 clock to 62.5 MHz
@@ -54,7 +54,7 @@ typedef enum
 } BSP_SPI_0_Clock_Divider_t;
 
 
-typedef enum
+typedef enum SPI_0_Chip_Select_Type
 {
     BSP_SPI_0_Chip_Select_0 = 0u,
     BSP_SPI_0_Chip_Select_1 = 1u

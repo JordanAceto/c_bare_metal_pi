@@ -35,8 +35,7 @@
     Public BSP_Aux_Mini_UART Types
  -------------------------------------------------------------------------------------------------*/
 
-// mini uart baud rate enum
-typedef enum
+typedef enum Mini_Uart_Baud_Rate_Type
 {
     BSP_AUX_Mini_Uart_Baud_Rate_9600   = 3254u, // sets the mini uart baud rate to 9600
     BSP_AUX_Mini_Uart_Baud_Rate_14400  = 2169u, // sets the mini uart baud rate to 14400
