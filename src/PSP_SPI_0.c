@@ -11,20 +11,20 @@
 
 // SPI 0 Register Addresses
 #define PSP_SPI_0_BASE_A      (PSP_REGS_SPI_0_BASE_ADDRESS) 
-#define PSP_SPI_0_CS_A        (PSP_SPI_0_BASE_A | 0x00000000u)           // SPI Master Control and Status address
-#define PSP_SPI_0_FIFO_A      (PSP_SPI_0_BASE_A | 0x00000004u)           // SPI Master TX and RX FIFOs address
-#define PSP_SPI_0_CLK_A       (PSP_SPI_0_BASE_A | 0x00000008u)           // SPI Master Clock Divider address
-#define PSP_SPI_0_DLEN_A      (PSP_SPI_0_BASE_A | 0x0000000Cu)           // SPI Master Data Length address
-#define PSP_SPI_0_LTOH_A      (PSP_SPI_0_BASE_A | 0x00000010u)           // SPI LOSSI mode TOH address
-#define PSP_SPI_0_DC_A        (PSP_SPI_0_BASE_A | 0x00000014u)           // SPI DMA DREQ Controls address
+#define PSP_SPI_0_CS_A        (PSP_SPI_0_BASE_A | 0x00000000u)   // SPI Master Control and Status address
+#define PSP_SPI_0_FIFO_A      (PSP_SPI_0_BASE_A | 0x00000004u)   // SPI Master TX and RX FIFOs address
+#define PSP_SPI_0_CLK_A       (PSP_SPI_0_BASE_A | 0x00000008u)   // SPI Master Clock Divider address
+#define PSP_SPI_0_DLEN_A      (PSP_SPI_0_BASE_A | 0x0000000Cu)   // SPI Master Data Length address
+#define PSP_SPI_0_LTOH_A      (PSP_SPI_0_BASE_A | 0x00000010u)   // SPI LOSSI mode TOH address
+#define PSP_SPI_0_DC_A        (PSP_SPI_0_BASE_A | 0x00000014u)   // SPI DMA DREQ Controls address
 
 // SPI 0 Register Pointers
-#define PSP_SPI_0_CS_R        (*((volatile uint32_t *)PSP_SPI_0_CS_A))   // SPI Master Control and Status register
-#define PSP_SPI_0_FIFO_R      (*((volatile uint32_t *)PSP_SPI_0_FIFO_A)) // SPI Master TX and RX FIFOs register
-#define PSP_SPI_0_CLK_R       (*((volatile uint32_t *)PSP_SPI_0_CLK_A))  // SPI Master Clock Divider register
-#define PSP_SPI_0_DLEN_R      (*((volatile uint32_t *)PSP_SPI_0_DLEN_A)) // SPI Master Data Length register
-#define PSP_SPI_0_LTOH_R      (*((volatile uint32_t *)PSP_SPI_0_LTOH_A)) // SPI LOSSI mode TOH register
-#define PSP_SPI_0_DC_R        (*((volatile uint32_t *)PSP_SPI_0_DC_A))   // SPI DMA DREQ Controls register
+#define PSP_SPI_0_CS_R        (*((vuint32_t *)PSP_SPI_0_CS_A))   // SPI Master Control and Status register
+#define PSP_SPI_0_FIFO_R      (*((vuint32_t *)PSP_SPI_0_FIFO_A)) // SPI Master TX and RX FIFOs register
+#define PSP_SPI_0_CLK_R       (*((vuint32_t *)PSP_SPI_0_CLK_A))  // SPI Master Clock Divider register
+#define PSP_SPI_0_DLEN_R      (*((vuint32_t *)PSP_SPI_0_DLEN_A)) // SPI Master Data Length register
+#define PSP_SPI_0_LTOH_R      (*((vuint32_t *)PSP_SPI_0_LTOH_A)) // SPI LOSSI mode TOH register
+#define PSP_SPI_0_DC_R        (*((vuint32_t *)PSP_SPI_0_DC_A))   // SPI DMA DREQ Controls register
 
 // SPI 0 Control Register Masks
 #define SPI_0_CS_LEN_LONG   0x02000000u  // Enable Long data word in Lossi mode if DMA_LEN is set
