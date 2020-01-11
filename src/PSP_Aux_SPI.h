@@ -1,6 +1,6 @@
 /**
  * DESCRIPTION:
- *      Just a start for Aux SPI 1 and 2
+ *      Just a start for Aux SPI 1 and 2, nothing works yet
  * 
  * NOTES:
  * 
@@ -18,12 +18,26 @@
     Public PSP_Aux_SPI Defines
  -------------------------------------------------------------------------------------------------*/
 
-
+// SPI 1 GPIO pin numbers
+#define PSP_SPI_1_CE2_PIN   16u
+#define PSP_SPI_1_CE1_PIN   17u
+#define PSP_SPI_1_CE0_PIN   18u
+#define PSP_SPI_1_MISO_PIN  19u
+#define PSP_SPI_1_MOSI_PIN  20u
+#define PSP_SPI_1_CLK_PIN   21u
 
 
 /*------------------------------------------------------------------------------------------------
     Public PSP_Aux_SPI Types
  -------------------------------------------------------------------------------------------------*/
+
+
+typedef enum Aux_SPI_CS_Type
+{
+    AUX_SPI_USE_CS_0 = 0b001u,
+    AUX_SPI_USE_CS_1 = 0b010u,
+    AUX_SPI_USE_CS_2 = 0b100u
+} PSP_Aux_SPI_CS_t;
 
 typedef union
 {
@@ -88,6 +102,71 @@ typedef union
 /*------------------------------------------------------------------------------------------------
     Public PSP_Aux_SPI Function Declarations
  -------------------------------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_SPI1_Start
+
+Function Description:
+    Initialize SPI1 by setting GPIO pins 16 through 21 to alt mode 4, and setting the chip
+    select pin to chip select 0.
+
+Inputs:
+    None
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void PSP_SPI1_Start(void);
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_SPI1_End
+
+Function Description:
+    Shuts down SPI1 by setting GPIO pins 16 through 21 to inputs.
+
+Inputs:
+    None
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void PSP_SPI1_End(void);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_SPI1_Transfer_Byte
+
+Function Description:
+    Write and read a single byte via SPI 1.
+
+Inputs:
+    val: the byte to write via SPI 0.
+
+Returns:
+    uint8_t: the value read by SPI 0.
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+uint8_t PSP_SPI1_Transfer_Byte(uint8_t val);
+
 
 
 
