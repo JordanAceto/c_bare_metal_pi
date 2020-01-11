@@ -23,4 +23,13 @@ typedef unsigned int       uint32_t; // 0 to 4294967295
 typedef long long           int64_t; // −9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
 typedef unsigned long long uint64_t; // 0 to 18,446,744,073,709,551,615
 
+typedef volatile int8_t     vint8_t;
+typedef volatile uint8_t   vuint8_t;
+typedef volatile int16_t   vint16_t;
+typedef volatile uint16_t vuint16_t;
+typedef volatile int32_t   vint32_t;
+typedef volatile uint32_t vuint32_t;
+typedef volatile int64_t   vint64_t;
+typedef volatile uint64_t vuint64_t;
+
 #endif
