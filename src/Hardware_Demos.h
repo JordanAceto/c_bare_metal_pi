@@ -24,6 +24,7 @@
 #include "PSP_SPI_0.h"
 #include "PSP_I2C.h"
 #include "PSP_Aux_Mini_UART.h"
+#include "BSP_Rotary_Encoder.h"
 
 
 
@@ -183,5 +184,54 @@ void demo_Mini_Uart()
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec); 
     }
 }
+
+
+/*
+    Simple demo of the Rotary Encoder module.
+
+    Sets up an encoder on pins 5 and 6, polls is as
+    fast as possible, and writes the encoder count
+    to the uart periodically.
+
+    To verify: you'll need an encoder set up according to 
+    this datasheet: https://www.bourns.com/docs/Product-Datasheets/PEC11R.pdf
+
+    And also something to read the uart.
+*/
+void demo_Rotary_Encoder()
+{
+    // make a new encoder on pins 5 and 6
+    BSP_Rotary_Encoder_t encoder =
+    {
+        5u, // pin A
+        6u, // pin B
+    };
+
+    // initialize the encoder
+    BSP_Rotary_Encoder_Initialize(&encoder);
+
+    // we'll print to the uart once every period
+    const uint64_t TIMER_PERIOD_uSec = 10000u;
+    
+    uint64_t time_stamp = 0u;
+
+    PSP_AUX_Mini_Uart_Init(PSP_AUX_Mini_Uart_Baud_Rate_9600);
+
+    while(1)
+    {
+        BSP_Poll_Rotary_Encoder(&encoder);
+
+        // write the encoder count to the uart periodically
+        if (PSP_Time_Get_Ticks() > time_stamp)
+        {
+            time_stamp = PSP_Time_Get_Ticks() + TIMER_PERIOD_uSec;
+            
+            // when printing, divide the count down a bit to slow it down, 
+            // this makes it easier to control the Bourns encoder I used
+            PSP_AUX_Mini_Uart_Send_Byte(encoder.count >> 2u);
+        }
+    }
+}
+
 
 #endif
