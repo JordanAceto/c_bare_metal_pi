@@ -11,7 +11,8 @@ int main()
     // demo_I2C();
     // demo_Mini_Uart();
     // demo_Rotary_Encoder();
-    demo_Hardware_RNG();
+    // demo_Hardware_RNG();
+    demo_ILI9341();
 
     return 0;
 }
