@@ -1,6 +1,5 @@
 
 #include "Hardware_Demos.h"
-
 int main()
 {
     // choose one feature to demo by uncommenting one of the demo functions
@@ -11,7 +10,8 @@ int main()
     // demo_SPI_0();
     // demo_I2C();
     // demo_Mini_Uart();
-    demo_Rotary_Encoder();
+    // demo_Rotary_Encoder();
+    demo_Hardware_RNG();
 
     return 0;
 }
