@@ -25,6 +25,7 @@
 #include "PSP_I2C.h"
 #include "PSP_Aux_Mini_UART.h"
 #include "BSP_Rotary_Encoder.h"
+#include "PSP_Hardware_RNG.h"
 
 
 
@@ -232,6 +233,43 @@ void demo_Rotary_Encoder()
         }
     }
 }
+
+/*
+    Simple demo of the hardware RNG module.
+
+    Blinks a LED with random brightness via PWM.
+
+    To verify: attach a LED to pin 12.
+
+*/
+void demo_Hardware_RNG()
+{
+    PSP_Hardware_RNG_Init();
+
+    const uint32_t DELAY_TIME_uSec = 300000u;
+
+    PSP_PWM_Clock_Init(PSP_PWM_Clock_Source_OSCILLATOR, PWM_DEFAULT_DIV);
+    PSP_PWM_Channel_Start(PSP_PWM_Channel_1, PSP_PWM_MARK_SPACE_MODE, PSP_PWM_RANGE_10_BITS);
+    PSP_PWM_Ch1_Set_GPIO12_To_PWM_Mode();
+
+    uint32_t pwm_val = 0u;
+
+    while(1)
+    {
+        // write a random value via PWM
+        PSP_PWM_Ch1_Write(pwm_val);
+
+        // get a new random number
+        pwm_val = PSP_Hardware_RNG_Get_Random();
+
+        // limit the range to 10 bits
+        pwm_val %= PSP_PWM_RANGE_10_BITS;
+
+        // wait to make the LED blink slow enough to see
+        PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
+    }
+}
+
 
 
 #endif
