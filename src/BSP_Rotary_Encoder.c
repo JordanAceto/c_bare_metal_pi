@@ -10,7 +10,7 @@
     To read a given encoder, its current pin A and B state as well as its last pin A and B states
     are maintained in a struct along with other information about the encoder.
 
-    For any given transition of current/last pin states the encoders counter should either
+    For any given transition of current/last pin states the encoder's counter should either
     count up, count down, or stay the same.
 
     The table of encoder-state to desired-counter-increment is below:
@@ -18,7 +18,7 @@
     (a0/b0 represent the last encoder state, and a1/b1 represent the current encoder state)
 
     a0  |  b0 |  a1 |  b1 |  result
-    -----------------------------------
+    --------------------------------
      0  |  0  |  0  |  0  |    0
      0  |  0  |  0  |  1  |    1
      0  |  0  |  1  |  0  |   -1
@@ -39,7 +39,9 @@
      1  |  1  |  1  |  0  |    1
      1  |  1  |  1  |  1  |    0
 
-    The information in the above table is stored in the STATE_TRANSITIONS array below.
+    The information in the above table is stored in the STATE_TRANSITIONS array below,
+    where the four-bit state of the encoder is used as the index into the array, and
+    thre result is stored as the value at that index.
 
     Because the encoder state is stored in a union, we can use this to directly index
     into the below array, and retrieve the correct counter increment for the given
