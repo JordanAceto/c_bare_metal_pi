@@ -26,6 +26,7 @@
 #include "PSP_Aux_Mini_UART.h"
 #include "BSP_Rotary_Encoder.h"
 #include "PSP_Hardware_RNG.h"
+#include "BSP_ILI9341_SPI_Display.h"
 
 
 
@@ -163,6 +164,7 @@ void demo_I2C()
 }
 
 
+
 /**
  * Simple demo of Auxiliary Mini Uart.
  * 
@@ -185,6 +187,7 @@ void demo_Mini_Uart()
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec); 
     }
 }
+
 
 
 /*
@@ -234,6 +237,8 @@ void demo_Rotary_Encoder()
     }
 }
 
+
+
 /*
     Simple demo of the hardware RNG module.
 
@@ -267,6 +272,49 @@ void demo_Hardware_RNG()
 
         // wait to make the LED blink slow enough to see
         PSP_Time_Delay_Microseconds(DELAY_TIME_uSec);
+    }
+}
+
+
+
+/*
+    Demo of ILI9341 SPI display.
+
+    Fills the screen with random pixels.
+
+    To verify: Connect an ILI9341 display like this:
+
+      ILI9341 pin  | RPi pin
+    ----------------------------------    
+        Vcc        | +3.3v
+        gnd        | gnd
+        CS         | GPIO8 (CE0)
+        reset      | +3.3v
+        D/C        | GPIO23
+        SDI (mosi) | GPIO10 (mosi)
+        SCK        | GPIO11 (SCK)
+        LED        | +3.3v
+        SDO (miso) | GPIO9 (miso)
+*/
+void demo_ILI9341()
+{
+    const uint32_t ILI9341_DC_PIN = 23u;
+
+    BSP_ILI9341_SPI_Display_Init(ILI9341_DC_PIN);
+
+    PSP_Hardware_RNG_Init();
+
+    BSP_ILI9341_Set_Window(0u, 0u, BSP_ILI9341_TFTWIDTH, BSP_ILI9341_TFTHEIGHT);
+
+    const uint32_t NUM_PIXELS = BSP_ILI9341_TFTWIDTH * BSP_ILI9341_TFTHEIGHT;
+    
+    while (1) 
+    {
+        // fill the screen with random pixels forever and ever.
+        for (int i = 0u; i < NUM_PIXELS; i++) 
+        {
+            PSP_SPI0_Transfer_16(PSP_Hardware_RNG_Get_Random() & 0xFFFFu);
+        }
     }
 }
 
