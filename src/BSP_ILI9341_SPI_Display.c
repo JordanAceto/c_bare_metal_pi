@@ -5,6 +5,7 @@
 #include "PSP_GPIO.h"
 #include "PSP_Time.h"
 
+
  /*-----------------------------------------------------------------------------------------------
     Private BSP_ILI9341_SPI_Display Defines
  -------------------------------------------------------------------------------------------------*/
@@ -65,10 +66,6 @@
 #define BSP_ILI9341_GMCTRP1    0xE0u // Positive Gamma Correction
 #define BSP_ILI9341_GMCTRN1    0xE1u // Negative Gamma Correction
 
-// display size properties
-#define BSP_ILI9341_TFTWIDTH  240u
-#define BSP_ILI9341_TFTHEIGHT 320u
-
 // a few standard colors
 #define ILI9341_BLACK       0x0000u  //   0,   0,   0
 #define ILI9341_NAVY        0x000Fu  //   0,   0, 128
@@ -93,60 +90,51 @@
 #define ILI9341_DC_PIN_WRITE_COMMAND 0u
 #define ILI9341_DC_PIN_WRITE_DATA    1u
 
-/*-----------------------------------------------------------------------------------------------
-    Private BSP_ILI9341_SPI_Display Variables
- -------------------------------------------------------------------------------------------------*/
-
-typedef struct ILI9341_SPI_Display_Type
-{
-    uint32_t DC_PIN;
-    uint32_t RESET_PIN;
-
-} BSP_ILI9341_SPI_Display_t;
-
-
 
 /*-----------------------------------------------------------------------------------------------
     Private BSP_ILI9341_SPI_Display Variables
  -------------------------------------------------------------------------------------------------*/
 
-BSP_ILI9341_SPI_Display_t display;
+uint32_t DC_PIN;
+
 
 
 /*-----------------------------------------------------------------------------------------------
     Private BSP_ILI9341_SPI_Display Functions
  -------------------------------------------------------------------------------------------------*/
 
+
 void ILI9341_Write_Command(uint8_t command)
 {
-    PSP_GPIO_Write_Pin(display.DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
     PSP_SPI0_Transfer_Byte(command);
-    PSP_GPIO_Write_Pin(display.DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
 }
+
 
 
 /*-----------------------------------------------------------------------------------------------
     BSP_ILI9341_SPI_Display Function Definitions
  -------------------------------------------------------------------------------------------------*/
 
+
 // note: init function is in a messy and silly state, just for testing currently
-void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num, uint32_t reset_pin_num)
+void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num)
 {
-    PSP_Time_Delay_Microseconds(1000000u);
+    // PSP_Time_Delay_Microseconds(1000000u);
 
-    // set up the d/c and reset pins
-    display.DC_PIN = dc_pin_num;
-    display.RESET_PIN = reset_pin_num;
-    PSP_GPIO_Set_Pin_Mode(display.DC_PIN,    PSP_GPIO_PINMODE_OUTPUT);
-    PSP_GPIO_Set_Pin_Mode(display.RESET_PIN, PSP_GPIO_PINMODE_OUTPUT);
-
-    PSP_GPIO_Write_Pin(display.DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
+    // set up the d/c pin
+    DC_PIN = dc_pin_num;
+    PSP_GPIO_Set_Pin_Mode(DC_PIN, PSP_GPIO_PINMODE_OUTPUT);
 
     // start SPI 0, use chip select pin 0
     PSP_SPI0_Start();
-    PSP_SPI0_Set_Clock_Divider(PSP_SPI0_Clock_Divider_1024);
+    // clock div 4 = 62.5MHz works, clock div of 2 didn't seem to work
+    // experimentation needed to find best clock speed
+    PSP_SPI0_Set_Clock_Divider(PSP_SPI0_Clock_Divider_4);
     PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_0);
 
+    // sw reset means we don't need to use up a pin for the reset line
     ILI9341_Write_Command(BSP_ILI9341_SWRESET);
     PSP_Time_Delay_Microseconds(150000u);
 
@@ -264,40 +252,22 @@ void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num, uint32_t reset_pin_num)
     PSP_Time_Delay_Microseconds(200000u);
 
     ILI9341_Write_Command(BSP_ILI9341_NORON);
+}
 
-    // Main loop - empty the screen as a test.
-    int tft_iter = 1u;
-    int tft_on = 0u;
 
-    // Set column range.
+
+void BSP_ILI9341_Set_Window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
+    // column set
     ILI9341_Write_Command(BSP_ILI9341_CASET);
-    PSP_SPI0_Transfer_16(0x0000u);
-    PSP_SPI0_Transfer_16(239u);
+    PSP_SPI0_Transfer_16(x0);
+    PSP_SPI0_Transfer_16(x1);
 
-    // Set row range.
+    // row set
     ILI9341_Write_Command(BSP_ILI9341_PASET);
-    PSP_SPI0_Transfer_16(0x0000u);
-    PSP_SPI0_Transfer_16(319u);
+    PSP_SPI0_Transfer_16(y0);
+    PSP_SPI0_Transfer_16(y1);
     
-    // Set 'write to RAM'
+    // write to RAM
     ILI9341_Write_Command(BSP_ILI9341_RAMWR);
-    
-    while (1) 
-    {
-        // Write 320 * 240 pixels.
-        for (tft_iter = 0u; tft_iter < (320u * 240u); ++tft_iter) 
-        {
-            // Write a 16-bit color.
-            if (tft_on) 
-            {
-                PSP_SPI0_Transfer_16(ILI9341_RED);
-            }
-            else 
-            {
-                PSP_SPI0_Transfer_16(ILI9341_BLUE);
-            }
-        }
-
-        tft_on ^= 1u;
-    }
 }
