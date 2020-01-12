@@ -10,8 +10,8 @@
  -------------------------------------------------------------------------------------------------*/
 
 // ILI9341 command set
-#define BSP_ILI9341_NOP        0x00u // No-op register
-#define BSP_ILI9341_SWRESET    0x01u // Software reset register
+#define BSP_ILI9341_NOP        0x00u // No-op command
+#define BSP_ILI9341_SWRESET    0x01u // Software reset command
 #define BSP_ILI9341_RDDID      0x04u // Read display identification information
 #define BSP_ILI9341_RDDST      0x09u // Read Display Status
 
