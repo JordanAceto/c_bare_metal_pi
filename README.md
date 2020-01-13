@@ -26,7 +26,7 @@
 ### The three required files (besides kernel.img) can be found here: https://github.com/raspberrypi/firmware/tree/master/boot
 
 ### Some notes about the code structure:
-- main.c is a sketchpad for whatever peripherals I'm working on.
+- Hardware_Demos.h contains a simple demo program for each of the modules as I add them.
+- main.c is a place to run one of the demos to verify the module on the real board.
 - Code files prefixed with "PSP" are part of the Processor Support Package. These files deal with registers and things close to the processor.
-- Code files prefixed with "BSB" are part of the Board Support Package. These files support things like communication protocols, ADC/DAC stuff, etc.
-- At a minimum, most PSP/BSP .h files will define register addresses and set up pointers to those registers for reading/writing to registers directly.
+- Code files prefixed with "BSP" are part of the Board Support Package. These files support things like external encoders/displays/ADC/DAC stuff, etc. Stuff you attach to the Pi with wires.
