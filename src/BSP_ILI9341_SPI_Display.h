@@ -33,25 +33,25 @@
 #define BSP_ILI9341_TFTHEIGHT 320u
 
 // a few standard colors
-#define ILI9341_BLACK       0x0000u
-#define ILI9341_NAVY        0x000Fu
-#define ILI9341_DARKGREEN   0x03E0u
-#define ILI9341_DARKCYAN    0x03EFu
-#define ILI9341_MAROON      0x7800u
-#define ILI9341_PURPLE      0x780Fu
-#define ILI9341_OLIVE       0x7BE0u
-#define ILI9341_LIGHTGREY   0xC618u
-#define ILI9341_DARKGREY    0x7BEFu
-#define ILI9341_BLUE        0x001Fu
-#define ILI9341_GREEN       0x07E0u
-#define ILI9341_CYAN        0x07FFu
-#define ILI9341_RED         0xF800u
-#define ILI9341_MAGENTA     0xF81Fu
-#define ILI9341_YELLOW      0xFFE0u
-#define ILI9341_WHITE       0xFFFFu
-#define ILI9341_ORANGE      0xFD20u
-#define ILI9341_GREENYELLOW 0xAFE5u
-#define ILI9341_PINK        0xF81Fu
+#define BSP_ILI9341_BLACK       0x0000u
+#define BSP_ILI9341_NAVY        0x000Fu
+#define BSP_ILI9341_DARKGREEN   0x03E0u
+#define BSP_ILI9341_DARKCYAN    0x03EFu
+#define BSP_ILI9341_MAROON      0x7800u
+#define BSP_ILI9341_PURPLE      0x780Fu
+#define BSP_ILI9341_OLIVE       0x7BE0u
+#define BSP_ILI9341_LIGHTGREY   0xC618u
+#define BSP_ILI9341_DARKGREY    0x7BEFu
+#define BSP_ILI9341_BLUE        0x001Fu
+#define BSP_ILI9341_GREEN       0x07E0u
+#define BSP_ILI9341_CYAN        0x07FFu
+#define BSP_ILI9341_RED         0xF800u
+#define BSP_ILI9341_MAGENTA     0xF81Fu
+#define BSP_ILI9341_YELLOW      0xFFE0u
+#define BSP_ILI9341_WHITE       0xFFFFu
+#define BSP_ILI9341_ORANGE      0xFD20u
+#define BSP_ILI9341_GREENYELLOW 0xAFE5u
+#define BSP_ILI9341_PINK        0xF81Fu
 
 
 /*-----------------------------------------------------------------------------------------------
