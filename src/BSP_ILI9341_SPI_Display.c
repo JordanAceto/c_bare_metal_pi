@@ -250,3 +250,35 @@ void BSP_ILI9341_Set_Window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
     // write to RAM
     ILI9341_Write_Command(BSP_ILI9341_RAMWR);
 }
+
+
+
+void BSP_ILI9341_Draw_Pixel(uint32_t x, uint32_t y, uint16_t color)
+{
+    BSP_ILI9341_Set_Window(x, y, x, y);
+    PSP_SPI0_Transfer_16(color);
+}
+
+
+
+void BSP_ILI9341_Draw_Horizontal_Line(uint32_t x, uint32_t y, uint32_t length, uint16_t color)
+{
+    BSP_ILI9341_Set_Window(x, y, x + length - 1u, y);
+
+    for (int i = 0u; i < length; i++)
+    {
+        PSP_SPI0_Transfer_16(color);
+    }
+}
+
+
+
+void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uint16_t color)
+{
+    BSP_ILI9341_Set_Window(x, y, x, y + height - 1u);
+
+    for (int i = 0u; i < height; i++)
+    {
+        PSP_SPI0_Transfer_16(color);
+    }
+}

@@ -103,4 +103,80 @@ Error Handling:
 void BSP_ILI9341_Set_Window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
 
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_ILI9341_Draw_Pixel
+
+Function Description:
+    Draws a single pixel on the screen.
+
+Inputs:
+    x, y: the coordinates of the pixel.
+    color: the 16 bit 5-6-5 color for the pixel.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_ILI9341_Draw_Pixel(uint32_t x, uint32_t y, uint16_t color);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_ILI9341_Draw_Horizontal_Line
+
+Function Description:
+    Draws a horizontal line on the screen.
+
+    The line starts at the given starting coordinates and goes right.
+
+Inputs:
+    x, y: the starting coordinates.
+    length: the length of the line in pixels. 
+    color: the 16 bit 5-6-5 color for the line.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_ILI9341_Draw_Horizontal_Line(uint32_t x, uint32_t y, uint32_t length, uint16_t color);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_ILI9341_Draw_Vertical_Line
+
+Function Description:
+    Draws a vertical line on the screen.
+
+    The line starts at the given starting coordinates and goes down.
+
+Inputs:
+    x, y: the starting coordinates.
+    height: the height of the line in pixels. 
+    color: the 16 bit 5-6-5 color for the line.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uint16_t color);
+
+
+
 #endif
