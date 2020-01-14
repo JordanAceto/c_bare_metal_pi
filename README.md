@@ -19,11 +19,10 @@
 
 ### These are the files that need to be on your SD card for it to boot:
 - bootcode.bin
-- fixup.dat
 - start.elf
 - kernel.img (this is the one that is generated from compiling your code)
 
-### The three required files (besides kernel.img) can be found here: https://github.com/raspberrypi/firmware/tree/master/boot
+### The two required files (besides kernel.img) can be found here: https://github.com/raspberrypi/firmware/tree/master/boot
 
 ### Some notes about the code structure:
 - All the .h header files are in the "api" folder. Read these to see how to use the various modules.
