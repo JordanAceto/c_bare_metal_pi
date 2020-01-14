@@ -280,7 +280,8 @@ void demo_Hardware_RNG()
 /*
     Demo of ILI9341 SPI display.
 
-    Fills the screen with moving triangle patterns.
+    Draws a few rectangles on the screen and then fills 
+    the screen with moving triangle patterns.
 
     To verify: Connect an ILI9341 display like this:
 
@@ -310,6 +311,18 @@ void demo_ILI9341()
     uint64_t time_stamp = 0u;
 
     uint32_t pos = 0u;
+
+    BSP_ILI9341_Draw_Rectangle_Outline(0u, 0u, 100u, 75u, BSP_ILI9341_ORANGE);
+    PSP_Time_Delay_Microseconds(1000000u);
+
+    BSP_ILI9341_Draw_Filled_Rectangle(100u, 100u, 50u, 75u, BSP_ILI9341_DARKGREEN);
+    PSP_Time_Delay_Microseconds(1000000u);
+
+    BSP_ILI9341_Draw_Filled_Rectangle(10u, 10u, 33u, 10u, BSP_ILI9341_PURPLE);
+    PSP_Time_Delay_Microseconds(1000000u);
+
+    BSP_ILI9341_Draw_Filled_Rectangle(200u, 200u, 25u, 45u, BSP_ILI9341_PINK);
+    PSP_Time_Delay_Microseconds(3000000u);
 
     while (1) 
     {
