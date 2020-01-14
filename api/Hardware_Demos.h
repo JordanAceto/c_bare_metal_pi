@@ -280,7 +280,7 @@ void demo_Hardware_RNG()
 /*
     Demo of ILI9341 SPI display.
 
-    Fills the screen with random pixels.
+    Fills the screen with moving triangle patterns.
 
     To verify: Connect an ILI9341 display like this:
 
@@ -306,14 +306,28 @@ void demo_ILI9341()
 
     BSP_ILI9341_Set_Window(0u, 0u, BSP_ILI9341_TFTWIDTH, BSP_ILI9341_TFTHEIGHT);
 
-    const uint32_t NUM_PIXELS = BSP_ILI9341_TFTWIDTH * BSP_ILI9341_TFTHEIGHT;
-    
+    const uint64_t TIMER_PERIOD_uSec = 20000u;
+    uint64_t time_stamp = 0u;
+
+    uint32_t pos = 0u;
+
     while (1) 
     {
-        // fill the screen with random pixels forever and ever.
-        for (int i = 0u; i < NUM_PIXELS; i++) 
+
+        if (PSP_Time_Get_Ticks() > time_stamp)
         {
-            PSP_SPI0_Transfer_16(PSP_Hardware_RNG_Get_Random() & 0xFFFFu);
+            time_stamp = PSP_Time_Get_Ticks() + TIMER_PERIOD_uSec;
+
+            BSP_ILI9341_Draw_Horizontal_Line(0u, pos, BSP_ILI9341_TFTWIDTH, BSP_ILI9341_CYAN);
+            BSP_ILI9341_Draw_Horizontal_Line(0u, pos + 1u, BSP_ILI9341_TFTWIDTH, BSP_ILI9341_CYAN);
+            BSP_ILI9341_Draw_Horizontal_Line(0u, pos + 2u, BSP_ILI9341_TFTWIDTH, BSP_ILI9341_CYAN);
+
+            BSP_ILI9341_Draw_Vertical_Line(pos, 0u, BSP_ILI9341_TFTHEIGHT, BSP_ILI9341_DARKGREEN);
+            BSP_ILI9341_Draw_Vertical_Line(pos + 1u, 0u, BSP_ILI9341_TFTHEIGHT, BSP_ILI9341_DARKGREEN);
+            BSP_ILI9341_Draw_Vertical_Line(pos + 2u, 0u, BSP_ILI9341_TFTHEIGHT, BSP_ILI9341_DARKGREEN);
+
+            pos += 45;
+            pos %= BSP_ILI9341_TFTHEIGHT;
         }
     }
 }

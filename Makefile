@@ -5,7 +5,7 @@ ARMGNU ?= arm-none-eabi
 SRC_DIR = src/
 BUILD_DIR = bin/
 
-CFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostartfiles
+CFLAGS = -Wall -O2 -Iapi -ffreestanding -nostdinc -nostartfiles
 
 TARGET = kernel.img
 
