@@ -282,3 +282,28 @@ void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uin
         PSP_SPI0_Transfer_16(color);
     }
 }
+
+
+
+void BSP_ILI9341_Draw_Filled_Rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
+{
+    BSP_ILI9341_Set_Window(x, y, x + width - 1u, y + height - 1u);
+
+    const uint32_t num_pixels = width * height;
+
+    for (uint32_t i = 0u; i < num_pixels; i++)
+    {
+        PSP_SPI0_Transfer_16(color);
+    }
+}
+
+
+
+void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
+{
+    BSP_ILI9341_Draw_Horizontal_Line(x, y, width, color);
+    BSP_ILI9341_Draw_Horizontal_Line(x, y + height - 1u, width, color);
+
+    BSP_ILI9341_Draw_Vertical_Line(x, y, height, color);
+    BSP_ILI9341_Draw_Vertical_Line(x + width - 1u, y, height, color);
+}

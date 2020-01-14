@@ -179,4 +179,58 @@ void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uin
 
 
 
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_ILI9341_Draw_Filled_Rectangle
+
+Function Description:
+    Draws a filled in rectangle on the screen.
+
+    The given (x, y) coordinate is the upper left corner of the rectangle.
+
+Inputs:
+    x, y: the upper left coordinates of the rectangle.
+    width: the width of the rectangle in pixels.
+    height: the height of the rectangle in pixels. 
+    color: the 16 bit 5-6-5 color for the rectangle.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_ILI9341_Draw_Filled_Rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_ILI9341_Draw_Rectangle_Outline
+
+Function Description:
+    Draws a rectangular outline on the screen.
+
+    The given (x, y) coordinate is the upper left corner of the rectangle.
+
+Inputs:
+    x, y: the upper left coordinates of the rectangle.
+    width: the width of the rectangle in pixels.
+    height: the height of the rectangle in pixels. 
+    color: the 16 bit 5-6-5 color for the rectangle.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color);
+
+
+
 #endif
