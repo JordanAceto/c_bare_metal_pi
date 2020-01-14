@@ -26,6 +26,8 @@
 ### The three required files (besides kernel.img) can be found here: https://github.com/raspberrypi/firmware/tree/master/boot
 
 ### Some notes about the code structure:
+- All the .h header files are in the "api" folder. Read these to see how to use the various modules.
+- All the .c and .s source files are in the "src" folder. Read these to see how it works.
 - Hardware_Demos.h contains a simple demo program for each of the modules as I add them.
 - main.c is a place to run one of the demos to verify the module on the real board.
 - Code files prefixed with "PSP" are part of the Processor Support Package. These files deal with registers and things close to the processor.
