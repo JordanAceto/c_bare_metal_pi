@@ -50,7 +50,7 @@ uint64_t PSP_Time_Get_Ticks(void)
 
 void PSP_Time_Delay_Microseconds(const uint32_t delay_time_uSec)
 {
-    uint64_t end_time = PSP_Time_Get_Ticks() + delay_time_uSec;
+    const uint64_t end_time = PSP_Time_Get_Ticks() + delay_time_uSec;
 
     while (PSP_Time_Get_Ticks() < end_time)
     {
