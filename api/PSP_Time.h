@@ -65,6 +65,6 @@ Error Handling:
     None
 
 -------------------------------------------------------------------------------------------------*/
-void PSP_Time_Delay_Microseconds(uint32_t delay_time_uSec);
+void PSP_Time_Delay_Microseconds(const uint32_t delay_time_uSec);
 
 #endif

@@ -43,16 +43,16 @@ uint64_t PSP_Time_Get_Ticks(void)
         CLO_reading = PSP_Time_CLO_R;
     }
 
-    return (uint64_t)CHI_reading << 32 | CLO_reading;
+    return (uint64_t)CHI_reading << 32u | CLO_reading;
 }
 
 
 
-void PSP_Time_Delay_Microseconds(uint32_t delay_time_uSec)
+void PSP_Time_Delay_Microseconds(const uint32_t delay_time_uSec)
 {
-    uint64_t start_time = PSP_Time_Get_Ticks();
+    uint64_t end_time = PSP_Time_Get_Ticks() + delay_time_uSec;
 
-    while (PSP_Time_Get_Ticks() < (start_time + delay_time_uSec))
+    while (PSP_Time_Get_Ticks() < end_time)
     {
         // wait
     }
