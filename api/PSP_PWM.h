@@ -7,7 +7,8 @@
  *      and GPIO19 are available as channel 2 PWM pins on the raspberry pi 3b+ breakout board.
  * 
  * REFERENCES:
- *      BCM2837-ARM-Peripherals.pdf page 138
+ *      BCM2837-ARM-Peripherals.pdf page 138 (PWM)
+ *      BCM2837-ARM-Peripherals.pdf page 105 (Clock manager info, not directly about PWM CM, but maps pretty well)
  */
 
 
