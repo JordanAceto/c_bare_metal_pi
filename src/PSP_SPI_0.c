@@ -100,7 +100,7 @@ typedef union SPI_0_CS_Reg_Type
 /* SPI 0 Master TX and RX FIFOs Register Type */
 typedef union SPI_0_FIFO_Reg_Type
 {
-    vuint32_t DATA; // Read/write the entire 32 bit word at once.
+    vuint32_t DATA; // SPI Master TX and RX FIFOs
 
 } SPI_0_FIFO_Regsiter_t;
 
@@ -115,8 +115,6 @@ typedef union SPI_0_CLK_Reg_Type
         vuint32_t RESERVED : 16u; // Reserved - Write as 0, read as don't care
     };
     
-    vuint32_t DATA; // Read/write the entire 32 bit word at once.
-    
 } SPI_0_CLK_Regsiter_t;
 
 
@@ -130,8 +128,6 @@ typedef union SPI_0_DLEN_Reg_Type
         vuint32_t RESERVED : 16u; // Reserved - Write as 0, read as don't care
     };
     
-    vuint32_t DATA; // Read/write the entire 32 bit word at once.
-    
 } SPI_0_DLEN_Regsiter_t;
 
 
@@ -144,8 +140,6 @@ typedef union SPI_0_LTOH_Reg_Type
         vuint32_t TOH      : 16u; // This sets the Output Hold delay in APB clocks. A value of 0 causes a 1 clock delay.
         vuint32_t RESERVED : 16u; // Reserved - Write as 0, read as don't care
     };
-    
-    vuint32_t DATA; // Read/write the entire 32 bit word at once.
     
 } SPI_0_LTOH_Regsiter_t;
 
