@@ -233,4 +233,29 @@ void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, uint32_t y, uint32_t width, 
 
 
 
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    BSP_ILI9341_Draw_Circle_Outline
+
+Function Description:
+    Draws a circular outline on the screen.
+
+    The given (x, y) coordinate is the center of the circle.
+
+Inputs:
+    x, y: the center of the circle.
+    r: the radius of the circle in pixels. 
+    color: the 16 bit 5-6-5 color for the circle.
+
+Returns:
+    None
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void BSP_ILI9341_Draw_Circle_Outline(uint32_t x, uint32_t y, uint32_t r, uint16_t color);
+
+
 #endif

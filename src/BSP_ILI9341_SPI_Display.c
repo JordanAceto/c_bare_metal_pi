@@ -69,6 +69,8 @@
 #define ILI9341_DC_PIN_WRITE_COMMAND 0u
 #define ILI9341_DC_PIN_WRITE_DATA    1u
 
+#define FIFO_SEND_LIMIT 16u
+
 
 /*-----------------------------------------------------------------------------------------------
     Private BSP_ILI9341_SPI_Display Variables
@@ -90,7 +92,34 @@ void ILI9341_Write_Command(uint8_t command)
     PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
 }
 
+void ILI9341_Send_Command(uint8_t command)
+{
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
+    PSP_SPI0_Send_Byte(command);
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
+}
 
+void BSP_ILI9341_Send_Address(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
+    // column set
+    ILI9341_Send_Command(BSP_ILI9341_CASET);
+    PSP_SPI0_Send_16(x0);
+    PSP_SPI0_Send_16(x1);
+
+    // row set
+    ILI9341_Send_Command(BSP_ILI9341_PASET);
+    PSP_SPI0_Send_16(y0);
+    PSP_SPI0_Send_16(y1);
+    
+    // write to RAM
+    ILI9341_Send_Command(BSP_ILI9341_RAMWR);
+}
+
+void BSP_ILI9341_Send_Pixel_Data(uint16_t x, uint16_t y, uint16_t color)
+{
+    BSP_ILI9341_Send_Address(x, y, x, y);
+    PSP_SPI0_Send_16(color);
+}
 
 /*-----------------------------------------------------------------------------------------------
     BSP_ILI9341_SPI_Display Function Definitions
@@ -237,64 +266,89 @@ void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num)
 
 void BSP_ILI9341_Set_Window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
-    // column set
-    ILI9341_Write_Command(BSP_ILI9341_CASET);
-    PSP_SPI0_Transfer_16(x0);
-    PSP_SPI0_Transfer_16(x1);
-
-    // row set
-    ILI9341_Write_Command(BSP_ILI9341_PASET);
-    PSP_SPI0_Transfer_16(y0);
-    PSP_SPI0_Transfer_16(y1);
-    
-    // write to RAM
-    ILI9341_Write_Command(BSP_ILI9341_RAMWR);
+    PSP_SPI0_Begin_Transfer();
+    BSP_ILI9341_Send_Address(x0, y0, x1, y1);
+    PSP_SPI0_End_Transfer();
 }
 
 
 
 void BSP_ILI9341_Draw_Pixel(uint32_t x, uint32_t y, uint16_t color)
 {
-    BSP_ILI9341_Set_Window(x, y, x, y);
-    PSP_SPI0_Transfer_16(color);
+    PSP_SPI0_Begin_Transfer();
+    BSP_ILI9341_Send_Pixel_Data(x, y, color);
+    PSP_SPI0_End_Transfer();
 }
 
 
 
 void BSP_ILI9341_Draw_Horizontal_Line(uint32_t x, uint32_t y, uint32_t length, uint16_t color)
 {
-    BSP_ILI9341_Set_Window(x, y, x + length - 1u, y);
+    PSP_SPI0_Begin_Transfer();
+
+    BSP_ILI9341_Send_Address(x, y, x + length - 1u, y);
 
     for (int i = 0u; i < length; i++)
     {
-        PSP_SPI0_Transfer_16(color);
+        PSP_SPI0_Send_16(color);
+
+        // break up the transfer if it gets long
+        if (i % FIFO_SEND_LIMIT == 0u)
+        {
+            PSP_SPI0_End_Transfer();
+            PSP_SPI0_Begin_Transfer();
+        }
     }
+
+    PSP_SPI0_End_Transfer();
 }
 
 
 
 void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uint16_t color)
 {
-    BSP_ILI9341_Set_Window(x, y, x, y + height - 1u);
+    PSP_SPI0_Begin_Transfer();
+
+    BSP_ILI9341_Send_Address(x, y, x, y + height - 1u);
 
     for (int i = 0u; i < height; i++)
     {
-        PSP_SPI0_Transfer_16(color);
+        PSP_SPI0_Send_16(color);
+
+        // break up the transfer if it gets long
+        if (i % FIFO_SEND_LIMIT == 0u)
+        {
+            PSP_SPI0_End_Transfer();
+            PSP_SPI0_Begin_Transfer();
+        }
     }
+
+    PSP_SPI0_End_Transfer();
 }
 
 
 
 void BSP_ILI9341_Draw_Filled_Rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
 {
-    BSP_ILI9341_Set_Window(x, y, x + width - 1u, y + height - 1u);
+    PSP_SPI0_Begin_Transfer();
+
+    BSP_ILI9341_Send_Address(x, y, x + width - 1u, y + height - 1u);
 
     const uint32_t num_pixels = width * height;
 
     for (uint32_t i = 0u; i < num_pixels; i++)
     {
-        PSP_SPI0_Transfer_16(color);
+        PSP_SPI0_Send_16(color);
+
+        // break up the transfer if it gets long
+        if (i % FIFO_SEND_LIMIT == 0u)
+        {
+            PSP_SPI0_End_Transfer();
+            PSP_SPI0_Begin_Transfer();
+        }
     }
+
+    PSP_SPI0_End_Transfer();
 }
 
 
@@ -306,4 +360,43 @@ void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, uint32_t y, uint32_t width, 
 
     BSP_ILI9341_Draw_Vertical_Line(x, y, height, color);
     BSP_ILI9341_Draw_Vertical_Line(x + width - 1u, y, height, color);
+}
+
+
+
+void BSP_ILI9341_Draw_Circle_Outline(uint32_t x, uint32_t y, uint32_t r, uint16_t color)
+{
+    int16_t f = 1 - r;
+    int16_t ddF_x = 1;
+    int16_t ddF_y = -2 * r;
+    int16_t x_ = 0;
+    int16_t y_ = r;
+
+    BSP_ILI9341_Draw_Pixel(x    , y + r, color);
+    BSP_ILI9341_Draw_Pixel(x    , y - r, color);
+    BSP_ILI9341_Draw_Pixel(x + r, y    , color);
+    BSP_ILI9341_Draw_Pixel(x - r, y    , color);
+
+    while (x_ < y_) 
+    {
+        if (f >= 0) 
+        {
+            y_--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+
+        x_++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        BSP_ILI9341_Draw_Pixel(x + x_, y + y_, color);
+        BSP_ILI9341_Draw_Pixel(x - x_, y + y_, color);
+        BSP_ILI9341_Draw_Pixel(x + x_, y - y_, color);
+        BSP_ILI9341_Draw_Pixel(x - x_, y - y_, color);
+        BSP_ILI9341_Draw_Pixel(x + y_, y + x_, color);
+        BSP_ILI9341_Draw_Pixel(x - y_, y + x_, color);
+        BSP_ILI9341_Draw_Pixel(x + y_, y - x_, color);
+        BSP_ILI9341_Draw_Pixel(x - y_, y - x_, color);
+    }
 }
