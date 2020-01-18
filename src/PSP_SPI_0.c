@@ -312,37 +312,27 @@ void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32
     uint32_t num_bytes_written = 0u;
     uint32_t num_bytes_read = 0u;
 
-    // clear the fifo
-    PSP_SPI_0_CS_R |= SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
-
-    // set Transfer Active high to enable transfer
-    PSP_SPI_0_CS_R |= SPI_0_CS_TA;
+    PSP_SPI0_Begin_Transfer();
 
     // write and read the given number of bytes of data 
     while ((num_bytes_written < num_bytes) || (num_bytes_read < num_bytes))
     { 
         // the Tx fifo can accept data and there is data to write
-        while((PSP_SPI_0_CS_R & SPI_0_CS_TXD) && (num_bytes_written < num_bytes))
+        while(SPI_0->CS.TXD && (num_bytes_written < num_bytes))
         {
-            PSP_SPI_0_FIFO_R = (uint8_t)p_Tx_buffer[num_bytes_written];
+            SPI_0->FIFO.DATA = (uint8_t)p_Tx_buffer[num_bytes_written];
             num_bytes_written++;
         }
 
         // the Rx fifo has data in it and there is data to read
-        while((PSP_SPI_0_CS_R & SPI_0_CS_RXD) && (num_bytes_read < num_bytes))
+        while(SPI_0->CS.RXD && (num_bytes_read < num_bytes))
         {
-            p_Rx_buffer[num_bytes_read] = (uint8_t)PSP_SPI_0_FIFO_R;
+            p_Rx_buffer[num_bytes_read] = (uint8_t)SPI_0->FIFO.DATA;
             num_bytes_read++;
         }
     }
 
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_DONE))
-    {
-        // wait for the transfer to complete
-    }
-
-    // set transfer active low to end the transfer
-    PSP_SPI_0_CS_R &= ~(SPI_0_CS_TA);
+    PSP_SPI0_End_Transfer();
 }
 
 
