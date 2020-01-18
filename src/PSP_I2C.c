@@ -186,13 +186,13 @@ typedef union I2C_CLKT_Reg_Type
 typedef struct I2C_Type
 {
     I2C_Control_Register_t C;    // Control Register
-    I2C_Status_Register_t S;     // Status Register
-    I2C_DLEN_Regsiter_t DLEN;    // Data Length Register 
+    I2C_Status_Register_t  S;    // Status Register
+    I2C_DLEN_Regsiter_t    DLEN; // Data Length Register 
     I2C_Address_Regsiter_t ADDR; // Slave Address Register
-    I2C_FIFO_Regsiter_t FIFO;    // FIFO Register
-    I2C_DIV_Regsiter_t DIV;      // Clock Divider Register
-    I2C_DEL_Regsiter_t DEL;      // Data Delay Register
-    I2C_CLKT_Regsiter_t CLKT;    // Clock Stretch Timout Register
+    I2C_FIFO_Regsiter_t    FIFO; // FIFO Register
+    I2C_DIV_Regsiter_t     DIV;  // Clock Divider Register
+    I2C_DEL_Regsiter_t     DEL;  // Data Delay Register
+    I2C_CLKT_Regsiter_t    CLKT; // Clock Stretch Timout Register
 } I2C_t;
 
 
