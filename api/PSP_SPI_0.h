@@ -5,7 +5,7 @@
  * NOTES:
  *      TODO: Writing data has been tested, but reading data has not. To do so,
  *      I'll need to set up some SPI device to talk back to the Pi and run some
- *      tests. Until then, consider reading data to be broken.
+ *      tests. Until then, reading data does not work.
  * 
  * REFERENCES:
  *      BCM2837-ARM-Peripherals.pdf page 148
@@ -113,7 +113,6 @@ void PSP_SPI0_End(void);
 
 
 
-
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
@@ -162,6 +161,98 @@ void PSP_SPI0_Set_Clock_Divider(PSP_SPI_0_Clock_Divider_t divider);
 /*-----------------------------------------------------------------------------------------------
 
 Function Name:
+    PSP_SPI0_Begin_Transfer
+
+Function Description:
+    Begins an SPI 0 transfer. It is expected that various send/recieve functions will be called
+    after beginning an SPI 0 transfer.
+
+Inputs:
+    None.
+
+Returns:
+    None.
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void PSP_SPI0_Begin_Transfer(void);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_SPI0_End_Transfer
+
+Function Description:
+    Ends an SPI 0 transfer. It is expected that PSP_SPI0_Begin_Transfer, and various send/recieve 
+    functions will be called before ending an SPI 0 transfer.
+
+Inputs:
+    None.
+
+Returns:
+    None.
+
+Error Handling:
+    None
+
+-------------------------------------------------------------------------------------------------*/
+void PSP_SPI0_End_Transfer(void);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_SPI0_Send_Byte
+
+Function Description:
+    Send a single byte as part of an SPI 0 transfer.
+
+Inputs:
+    val: the byte to write via SPI 0.
+
+Returns:
+    None.
+
+Error Handling:
+    None. Expects that PSP_SPI0_Begin_Transfer was called before calling this function and that
+    PSP_SPI0_End_Transfer will be called at the end of the transfer.
+
+-------------------------------------------------------------------------------------------------*/
+uint8_t PSP_SPI0_Send_Byte(uint8_t val);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_SPI0_Send_16
+
+Function Description:
+    Send a 16 bit word as part of an SPI 0 transfer.
+
+Inputs:
+    val: the 16 bit value to write via SPI 0.
+
+Returns:
+    None.
+
+Error Handling:
+    None. Expects that PSP_SPI0_Begin_Transfer was called before calling this function and that
+    PSP_SPI0_End_Transfer will be called at the end of the transfer.
+
+-------------------------------------------------------------------------------------------------*/
+uint8_t PSP_SPI0_Send_16(uint16_t val);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
     PSP_SPI0_Transfer_Byte
 
 Function Description:
@@ -174,7 +265,7 @@ Returns:
     uint8_t: the value read by SPI 0.
 
 Error Handling:
-    None
+    None. This method does not require PSP_SPI0_Begin_Transfer/PSP_SPI0_End_Transfer bookends.
 
 -------------------------------------------------------------------------------------------------*/
 uint8_t PSP_SPI0_Transfer_Byte(uint8_t val);
@@ -196,7 +287,7 @@ Returns:
     uint16_t: the value read by SPI 0.
 
 Error Handling:
-    None
+    None. This method does not require PSP_SPI0_Begin_Transfer/PSP_SPI0_End_Transfer bookends.
 
 -------------------------------------------------------------------------------------------------*/
 uint16_t PSP_SPI0_Transfer_16(uint16_t val);
@@ -222,6 +313,7 @@ Returns:
 
 Error Handling:
     None, note that the Tx and Rx buffers MUST both be at least num_bytes long.
+    This method does not require PSP_SPI0_Begin_Transfer/PSP_SPI0_End_Transfer bookends.
 
 -------------------------------------------------------------------------------------------------*/
 void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32_t num_bytes);

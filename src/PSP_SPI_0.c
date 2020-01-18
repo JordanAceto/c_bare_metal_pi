@@ -55,6 +55,138 @@
 #define SPI_0_CS_CS2        0x00000001u  // Chip Select 2
 
 
+/*-----------------------------------------------------------------------------------------------
+    Private PSP_SPI_0 Types
+ -------------------------------------------------------------------------------------------------*/
+
+/* SPI 0 Master Control and Status Register Type */
+typedef union SPI_0_CS_Reg_Type
+{
+    struct
+    {
+        vuint32_t CHIP_SEL : 2u; // Chip Select, 00 = Chip select 0, 01 = Chip select 1
+        vuint32_t CPHA     : 1u; // Clock Phase. 0 = First SCLK transition at middle of data bit, else beginning.
+        vuint32_t CPOL     : 1u; // Clock Polarity. 0 = Rest state of clock = low, else high.
+        vuint32_t CLR_FIFO : 2u; // Clear FIFOs. 00 = No action. x1 = Clear TX FIFO. 1x = Clear RX FIFO.
+        vuint32_t CSPOL    : 1u; // Chip Select Polarity. 0 = Chip select lines are active low, else high.
+        vuint32_t TA       : 1u; // Transfer Active. 0 = Transfer not active, 1 = Transfer active.
+        vuint32_t DMAEN    : 1u; // DMAEN DMA Enable. 0 = No DMA requests will be issued, 1 = Enable DMA operation.
+        vuint32_t INTD     : 1u; // INTD Interrupt on Done. 0 = Don t generate interrupt on transfer complete.
+        vuint32_t INTR     : 1u; // INTR Interrupt on RXR. 0 = Don t generate interrupts on RX FIFO condition.
+        vuint32_t ADCS     : 1u; // ADCS Automatically Deassert Chip Select
+        vuint32_t REN      : 1u; // REN Read Enable. 0 = We intend to write to the SPI peripheral, 1 = read.
+        vuint32_t LEN      : 1u; // LoSSI enable. 0 = The serial interface will behave as an SPI master, 1 = LoSSI master.
+        vuint32_t LMONO    : 1u; // Unused
+        vuint32_t TE_EN    : 1u; // Unused
+        vuint32_t DONE     : 1u; // Transfer Done. 0 = Transfer is in progress (or not active TA = 0), 1 = Tr complete.
+        vuint32_t RXD      : 1u; // RX FIFO contains Data. 0 = RX FIFO is empty, 1 = RX FIFO contains at least 1 byte.
+        vuint32_t TXD      : 1u; // TX FIFO can accept Data. 0 = TX FIFO is full, 1 = TX FIFO has space for at least 1 byte.
+        vuint32_t RXR      : 1u; // RX FIFO needs Reading. 0 = RX FIFO is less than full (or not active TA = 0), 1 = full.
+        vuint32_t RXF      : 1u; // RX FIFO Full. 0 = RXFIFO is not full, 1 = RX FIFO is full.
+        vuint32_t CSPOL0   : 1u; // Chip Select 0 Polarity. 0 = Chip select is active low, 1 = Chip select is active high.
+        vuint32_t CSPOL1   : 1u; // Chip Select 1 Polarity. 0 = Chip select is active low, 1 = Chip select is active high.
+        vuint32_t CSPOL2   : 1u; // Chip Select 2 Polarity. Unused.
+        vuint32_t DMA_LEN  : 1u; // Enable DMA mode in Lossi mode.
+        vuint32_t LEN_LONG : 1u; // Enable Long data word in Lossi mode if DMA_LEN is set. 0 = byte, 1 = 32 bit word.
+        vuint32_t RESERVED : 6u; // Reserved - Write as 0, read as don't care
+    };
+
+    vuint32_t Data; // Read/write the entire 32 bit word at once.
+    
+} SPI_0_CS_Regsiter_t;
+
+
+
+/* SPI 0 Master TX and RX FIFOs Register Type */
+typedef union SPI_0_FIFO_Reg_Type
+{
+    vuint32_t DATA; // Read/write the entire 32 bit word at once.
+
+} SPI_0_FIFO_Regsiter_t;
+
+
+
+/* SPI 0 Master Clock Divider Register Type */
+typedef union SPI_0_CLK_Reg_Type
+{
+    struct
+    {
+        vuint32_t CDIV     : 16u; // Clock Divider. SCLK = Core Clock / CDIV. If CDIV is set to 0, the divisor is 65536
+        vuint32_t RESERVED : 16u; // Reserved - Write as 0, read as don't care
+    };
+    
+    vuint32_t DATA; // Read/write the entire 32 bit word at once.
+    
+} SPI_0_CLK_Regsiter_t;
+
+
+
+/* SPI 0 Master Data Length Register Type */
+typedef union SPI_0_DLEN_Reg_Type
+{
+    struct
+    {
+        vuint32_t LEN      : 16u; // Data Length. The number of bytes to transfer.
+        vuint32_t RESERVED : 16u; // Reserved - Write as 0, read as don't care
+    };
+    
+    vuint32_t DATA; // Read/write the entire 32 bit word at once.
+    
+} SPI_0_DLEN_Regsiter_t;
+
+
+
+/* SPI 0 LOSSI mode TOH Register Type */
+typedef union SPI_0_LTOH_Reg_Type
+{
+    struct
+    {
+        vuint32_t TOH      : 16u; // This sets the Output Hold delay in APB clocks. A value of 0 causes a 1 clock delay.
+        vuint32_t RESERVED : 16u; // Reserved - Write as 0, read as don't care
+    };
+    
+    vuint32_t DATA; // Read/write the entire 32 bit word at once.
+    
+} SPI_0_LTOH_Regsiter_t;
+
+
+
+/* SPI 0 DMA DREQ Controls Register Type */
+typedef union SPI_0_DC_Reg_Type
+{
+    struct
+    {
+        vuint32_t TDREQ  : 8u; // DMA Write Request Threshold.
+        vuint32_t TPANIC : 8u; // DMA Write Panic Threshold.
+        vuint32_t RDREQ  : 8u; // DMA Read Request Threshold.
+        vuint32_t RPANIC : 8u; // DMA Read Panic Threshold.
+    };
+    
+    vuint32_t DATA; // Read/write the entire 32 bit word at once.
+    
+} SPI_0_DC_Regsiter_t;
+
+
+
+typedef struct SPI_0_Type
+{
+    SPI_0_CS_Regsiter_t   CS;   // SPI Master Control and Status Register
+    SPI_0_FIFO_Regsiter_t FIFO; // SPI Master TX and RX FIFO Register
+    SPI_0_CLK_Regsiter_t  CLK;  // SPI Master Clock Divider Register
+    SPI_0_DLEN_Regsiter_t DLEN; // SPI Master Data Length Register
+    SPI_0_LTOH_Regsiter_t LTOH; // SPI LOSSI mode TOH Register
+    SPI_0_DC_Regsiter_t   DC;   // SPI DMA DREQ Controls Register
+} SPI_0_t;
+
+
+
+/*-----------------------------------------------------------------------------------------------
+    Private PSP_SPI_0 Variables
+ -------------------------------------------------------------------------------------------------*/
+
+volatile SPI_0_t * SPI_0 = (volatile SPI_0_t *)PSP_SPI_0_BASE_A;
+
+
 
 /*-----------------------------------------------------------------------------------------------
     PSP_SPI_0 Function Definitions
@@ -71,10 +203,10 @@ void PSP_SPI0_Start(void)
     PSP_GPIO_Set_Pin_Mode(PSP_SPI_0_CLK_PIN,  PSP_GPIO_PINMODE_ALT0);
 
     // zero out the control/status register
-    PSP_SPI_0_CS_R = 0u;
+    SPI_0->CS.Data = 0u;
 
-    // clear the fifo
-    PSP_SPI_0_CS_R = SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
+    // clear the fifos
+    SPI_0->CS.CLR_FIFO = 0b11u;
 
     // default to chip select 0
     PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_0);
@@ -96,77 +228,81 @@ void PSP_SPI0_End(void)
 
 void PSP_SPI0_Set_Clock_Divider(PSP_SPI_0_Clock_Divider_t divider)
 {
-    PSP_SPI_0_CLK_R = divider;
+    SPI_0->CLK.CDIV = divider;
+}
+
+
+
+void PSP_SPI0_Begin_Transfer(void)
+{
+    // clear the fifos
+    SPI_0->CS.CLR_FIFO = 0b11u;
+
+    // set Transfer Active high to enable transfer
+    SPI_0->CS.TA = 1u;
+}
+
+
+
+void PSP_SPI0_End_Transfer(void)
+{
+    while (SPI_0->CS.TA == 1u && SPI_0->CS.DONE == 0u)
+    {
+        // wait for the transfer to complete
+    }
+
+    // set transfer active low to end the transfer
+    SPI_0->CS.TA = 0u;
+}
+
+
+
+uint8_t PSP_SPI0_Send_Byte(uint8_t val)
+{
+    while (SPI_0->CS.TXD == 0u)
+    {
+        // wait for TX fifo to be ready to accept data
+    }
+
+    // write the value into the fifo
+    SPI_0->FIFO.DATA = val;
+}
+
+
+
+uint8_t PSP_SPI0_Send_16(uint16_t val)
+{
+    while (SPI_0->CS.TXD == 0u)
+    {
+        // wait for TX fifo to be ready to accept data
+    }
+
+    const uint8_t high_byte = val >> 8u;
+    const uint8_t low_byte = val & 0xFFu;
+
+    // write the value into the fifo, high byte first
+    SPI_0->FIFO.DATA = high_byte;
+    SPI_0->FIFO.DATA = low_byte;
 }
 
 
 
 uint8_t PSP_SPI0_Transfer_Byte(uint8_t val)
 {
-    // clear the fifo
-    PSP_SPI_0_CS_R |= SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
-
-    // set Transfer Active high to enable transfer
-    PSP_SPI_0_CS_R |= SPI_0_CS_TA;
-
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_TXD))
-    {
-        // wait for TX fifo to be ready to accept data
-    }
-
-    // write the value into the fifo
-    PSP_SPI_0_FIFO_R = val;
-
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_DONE))
-    {
-        // wait for the transfer to complete
-    }
-
-    // read the byte in the fifo
-    uint8_t retval = PSP_SPI_0_FIFO_R;
-
-    // set transfer active low to end the transfer
-    PSP_SPI_0_CS_R &= ~(SPI_0_CS_TA);
-
-    // return the return value
-    return retval;
+    PSP_SPI0_Begin_Transfer();
+    PSP_SPI0_Send_Byte(val);
+    PSP_SPI0_End_Transfer();
+    return 0u;
 }
 
 
 
 uint16_t PSP_SPI0_Transfer_16(uint16_t val)
 {
-    // clear the fifo
-    PSP_SPI_0_CS_R |= SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
-
-    // set Transfer Active high to enable transfer
-    PSP_SPI_0_CS_R |= SPI_0_CS_TA;
-
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_TXD))
-    {
-        // wait for TX fifo to be ready to accept data
-    }
-
-    uint8_t high_byte = val >> 8u;
-    uint8_t low_byte = val & 0xFFu;
-
-    // write the value into the fifo, high byte first
-    PSP_SPI_0_FIFO_R = high_byte;
-    PSP_SPI_0_FIFO_R = low_byte;
-
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_DONE))
-    {
-        // wait for the transfer to complete
-    }
-
-    // read the value in the fifo
-    uint16_t retval = PSP_SPI_0_FIFO_R;
-
-    // set transfer active low to end the transfer
-    PSP_SPI_0_CS_R &= ~(SPI_0_CS_TA);
-
-    // return the return value
-    return retval;
+    PSP_SPI0_Begin_Transfer();
+    PSP_SPI0_Send_16(val);
+    PSP_SPI0_End_Transfer();
+    return 0u;
 }
 
 
@@ -213,5 +349,6 @@ void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32
 
 void PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_t chip_select)
 {
-    PSP_SPI_0_CS_R = (PSP_SPI_0_CS_R & 0xFFFFFFFCu) | chip_select;
+    // PSP_SPI_0_CS_R = (PSP_SPI_0_CS_R & 0xFFFFFFFCu) | chip_select;
+    SPI_0->CS.CHIP_SEL = chip_select;
 }
