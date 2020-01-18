@@ -223,7 +223,7 @@ Error Handling:
     PSP_SPI0_End_Transfer will be called at the end of the transfer.
 
 -------------------------------------------------------------------------------------------------*/
-uint8_t PSP_SPI0_Send_Byte(uint8_t val);
+void PSP_SPI0_Send_Byte(uint8_t val);
 
 
 
@@ -246,7 +246,7 @@ Error Handling:
     PSP_SPI0_End_Transfer will be called at the end of the transfer.
 
 -------------------------------------------------------------------------------------------------*/
-uint8_t PSP_SPI0_Send_16(uint16_t val);
+void PSP_SPI0_Send_16(uint16_t val);
 
 
 

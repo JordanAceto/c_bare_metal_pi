@@ -251,7 +251,7 @@ void PSP_SPI0_End_Transfer(void)
 
 
 
-uint8_t PSP_SPI0_Send_Byte(uint8_t val)
+void PSP_SPI0_Send_Byte(uint8_t val)
 {
     while (SPI_0->CS.TXD == 0u)
     {
@@ -264,7 +264,7 @@ uint8_t PSP_SPI0_Send_Byte(uint8_t val)
 
 
 
-uint8_t PSP_SPI0_Send_16(uint16_t val)
+void PSP_SPI0_Send_16(uint16_t val)
 {
     while (SPI_0->CS.TXD == 0u)
     {
