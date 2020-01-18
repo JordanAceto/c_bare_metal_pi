@@ -9,6 +9,7 @@
  * REFERENCES:
  *      BCM2837-ARM-Peripherals.pdf page 138 (PWM)
  *      BCM2837-ARM-Peripherals.pdf page 105 (Clock manager info, not directly about PWM CM, but maps pretty well)
+ *      https://elinux.org/BCM2835_datasheet_errata#p105_table (more information about Clock Manager)
  */
 
 
@@ -35,11 +36,10 @@
 typedef enum PWM_Clock_Source_Type
 {
     PSP_PWM_Clock_Source_GND = 0u,        // clock off
-    PSP_PWM_Clock_Source_OSCILLATOR = 1u, // internal oscillator runs at 19.2MHz
-    PSP_PWM_Clock_Source_PLL_A = 4u,      // defaults to off?
-    PSP_PWM_Clock_Source_PLL_C = 5u,      // defaults to about 990.799MHz?
-    PSP_PWM_Clock_Source_PLL_D = 6u,      // defaults to about 500MHz?
-    PSP_PWM_Clock_Source_HDMI_AUX = 7u    // defaults to about 216MHz?
+    PSP_PWM_Clock_Source_OSCILLATOR = 1u, // 19.2MHz
+    PSP_PWM_Clock_Source_PLL_C = 5u,      // 1,000MHz (changes with overclock settings)
+    PSP_PWM_Clock_Source_PLL_D = 6u,      // 500MHz
+    PSP_PWM_Clock_Source_HDMI_AUX = 7u    // 216MHz
 } PSP_PWM_Clock_Source_t;
 
 
