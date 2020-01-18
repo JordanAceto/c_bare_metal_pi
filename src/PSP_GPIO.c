@@ -228,46 +228,46 @@ typedef union GPIO_PUD_Register_Type
 
 typedef struct GPIO_Type
 {
-    GPIO_FSEL_Register_t       GPFSEL0;
-    GPIO_FSEL_Register_t       GPFSEL1;
-    GPIO_FSEL_Register_t       GPFSEL2;
-    GPIO_FSEL_Register_t       GPFSEL3;
-    GPIO_FSEL_Register_t       GPFSEL4;
-    GPIO_FSEL_Register_t       GPFSEL5;
+    GPIO_FSEL_Register_t       GPFSEL0;   // GPIO Function Select 0 Register
+    GPIO_FSEL_Register_t       GPFSEL1;   // GPIO Function Select 1 Register
+    GPIO_FSEL_Register_t       GPFSEL2;   // GPIO Function Select 2 Register
+    GPIO_FSEL_Register_t       GPFSEL3;   // GPIO Function Select 3 Register
+    GPIO_FSEL_Register_t       GPFSEL4;   // GPIO Function Select 4 Register
+    GPIO_FSEL_Register_t       GPFSEL5;   // GPIO Function Select 5 Register
     vuint32_t RESERVED_1;
-    GPIO_Pin_Register_Bank_0_t GPSET0;
-    GPIO_Pin_Register_Bank_1_t GPSET1;
+    GPIO_Pin_Register_Bank_0_t GPSET0;    // GPIO Pin Output Set 0 Register
+    GPIO_Pin_Register_Bank_1_t GPSET1;    // GPIO Pin Output Set 1 Register
     vuint32_t RESERVED_2;
-    GPIO_Pin_Register_Bank_0_t GPCLR0;
-    GPIO_Pin_Register_Bank_1_t GPCLR1;
+    GPIO_Pin_Register_Bank_0_t GPCLR0;    // GPIO Pin Output Clear 0 Register
+    GPIO_Pin_Register_Bank_1_t GPCLR1;    // GPIO Pin Output Clear 1 Register
     vuint32_t RESERVED_3;
-    GPIO_Pin_Register_Bank_0_t GPLEV0;
-    GPIO_Pin_Register_Bank_1_t GPLEV1;
+    GPIO_Pin_Register_Bank_0_t GPLEV0;    // GPIO Pin Level 0 Register
+    GPIO_Pin_Register_Bank_1_t GPLEV1;    // GPIO Pin Level 0 Register
     vuint32_t RESERVED_4;
-    GPIO_Pin_Register_Bank_0_t GPEDS0;
-    GPIO_Pin_Register_Bank_1_t GPEDS1;
+    GPIO_Pin_Register_Bank_0_t GPEDS0;    // GPIO Pin Event Detect Status 0 Register
+    GPIO_Pin_Register_Bank_1_t GPEDS1;    // GPIO Pin Event Detect Status 1 Register
     vuint32_t RESERVED_5;
-    GPIO_Pin_Register_Bank_0_t GPREN0;
-    GPIO_Pin_Register_Bank_1_t GPREN1;
+    GPIO_Pin_Register_Bank_0_t GPREN0;    // GPIO Pin Rising Edge Detect Enable 0 Register
+    GPIO_Pin_Register_Bank_1_t GPREN1;    // GPIO Pin Rising Edge Detect Enable 1 Register
     vuint32_t RESERVED_6;
-    GPIO_Pin_Register_Bank_0_t GPFEN0;
-    GPIO_Pin_Register_Bank_1_t GPFEN1;
+    GPIO_Pin_Register_Bank_0_t GPFEN0;    // GPIO Pin Falling Edge Detect Enable 0 Register
+    GPIO_Pin_Register_Bank_1_t GPFEN1;    // GPIO Pin Falling Edge Detect Enable 1 Register
     vuint32_t RESERVED_7;
-    GPIO_Pin_Register_Bank_0_t GPHEN0;
-    GPIO_Pin_Register_Bank_1_t GPHEN1;
+    GPIO_Pin_Register_Bank_0_t GPHEN0;    // GPIO Pin High Detect Enable 0 Register
+    GPIO_Pin_Register_Bank_1_t GPHEN1;    // GPIO Pin High Detect Enable 1 Register
     vuint32_t RESERVED_8;
-    GPIO_Pin_Register_Bank_0_t GPLEN0;
-    GPIO_Pin_Register_Bank_1_t GPLEN1;
+    GPIO_Pin_Register_Bank_0_t GPLEN0;    // GPIO Pin Low Detect Enable 0 Register
+    GPIO_Pin_Register_Bank_1_t GPLEN1;    // GPIO Pin Low Detect Enable 1 Register
     vuint32_t RESERVED_9;
-    GPIO_Pin_Register_Bank_0_t GPAREN0;
-    GPIO_Pin_Register_Bank_1_t GPAREN1;
+    GPIO_Pin_Register_Bank_0_t GPAREN0;   // GPIO Pin Async. Rising Edge Detect 0 Register
+    GPIO_Pin_Register_Bank_1_t GPAREN1;   // GPIO Pin Async. Rising Edge Detect 1 Register
     vuint32_t RESERVED_10;
-    GPIO_Pin_Register_Bank_0_t GPAFEN0;
-    GPIO_Pin_Register_Bank_1_t GPAFEN1;
+    GPIO_Pin_Register_Bank_0_t GPAFEN0;   // GPIO Pin Async. Falling Edge Detect 0 Register
+    GPIO_Pin_Register_Bank_1_t GPAFEN1;   // GPIO Pin Async. Falling Edge Detect 1 Register
     vuint32_t RESERVED_11;
-    GPIO_PUD_Register_t        GPPUD;
-    GPIO_Pin_Register_Bank_0_t GPPUDCLK0;
-    GPIO_Pin_Register_Bank_1_t GPPUDCLK1;
+    GPIO_PUD_Register_t        GPPUD;     // GPIO Pin Pull-up/down Enable Register
+    GPIO_Pin_Register_Bank_0_t GPPUDCLK0; // GPIO Pin Pull-up/down Enable Clock 0 Register
+    GPIO_Pin_Register_Bank_1_t GPPUDCLK1; // GPIO Pin Pull-up/down Enable Clock 1 Register
     vuint32_t RESERVED_12;
     vuint32_t TEST;
 } GPIO_t;
