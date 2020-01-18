@@ -339,6 +339,5 @@ void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32
 
 void PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_t chip_select)
 {
-    // PSP_SPI_0_CS_R = (PSP_SPI_0_CS_R & 0xFFFFFFFCu) | chip_select;
     SPI_0->CS.CHIP_SEL = chip_select;
 }
