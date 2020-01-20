@@ -35,6 +35,22 @@
 #define PSP_GPIO_PIN_WRITE_LOW  0u
 
 
+
+/*-----------------------------------------------------------------------------------------------
+    Public PSP_GPIO Types
+ -------------------------------------------------------------------------------------------------*/
+
+
+typedef enum PSP_GPIO_Edge_Detect_Type
+{
+    GPIO_EDGE_TYPE_RISING,   // detects rising edge transitions
+    GPIO_EDGE_TYPE_FALLING,  // detects falling edge transitions
+    GPIO_EDGE_TYPE_CHANGING, // detects rising and falling edge transitions
+    GPIO_EDGE_TYPE_NO_EDGE   // disable edge detects
+} PSP_GPIO_Edge_Detect_t;
+
+
+
 /*-----------------------------------------------------------------------------------------------
     Public PSP_GPIO Function Declarations
  -------------------------------------------------------------------------------------------------*/
@@ -118,5 +134,56 @@ Error Handling:
 
 -------------------------------------------------------------------------------------------------*/
 uint32_t PSP_GPIO_Read_Pin(uint32_t pin_num);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_GPIO_Pin_Enable_Edge_Detect
+
+Function Description:
+    Enable a given edge detect for a given GPIO pin.
+
+Inputs:
+    pin_num: GPIO pin number to enable the edge detect.
+    edge: the edge to detect.
+
+Returns:
+    None.
+
+Error Handling:
+    Returns without having any effect if the pin number is out of range or edge type is invalid.
+
+-------------------------------------------------------------------------------------------------*/
+void PSP_GPIO_Pin_Enable_Edge_Detect(uint32_t pin_num, PSP_GPIO_Edge_Detect_t edge);
+
+
+
+/*-----------------------------------------------------------------------------------------------
+
+Function Name:
+    PSP_GPIO_Event_Detected
+
+Function Description:
+    Read a GPIO pin and return 0 if an event was not detected and 1 if an event was detected.
+
+    If an event is detected, it is cleared.
+
+Inputs:
+    pin_num: GPIO pin number to read.
+
+Returns:
+    Whether an event was detected or not (0 or 1).
+
+Error Handling:
+    Returns 0 if the pin number is out of range.
+
+    Assumes that PSP_GPIO_Pin_Enable_Edge_Detect previously assigned an edge for this pin to detect.
+
+-------------------------------------------------------------------------------------------------*/
+uint32_t PSP_GPIO_Event_Detected(uint32_t pin_num);
+
+
 
 #endif

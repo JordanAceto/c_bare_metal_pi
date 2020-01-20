@@ -318,9 +318,10 @@ void PSP_GPIO_Set_Pin_Mode(uint32_t pin_num, uint32_t pin_mode)
 {
     if (PSP_GPIO_NUM_GPIO_PINS <= pin_num || PSP_GPIO_MAX_PINMODE_VALUE < pin_mode)
     {
-        return; // invalid pin number or pin mode, do nothing
+        // invalid pin number or pin mode, do nothing
+        return;
     }
-    else
+    else /* it is a valid pin and mode */
     {
         // start at GPFSEL0, we'll move into the correct GPFSEL register by adding an offset
         uint32_t GPFSEL_n_Addr = PSP_GPIO_GPFSEL0_A;
@@ -390,9 +391,10 @@ void PSP_GPIO_Write_Pin(uint32_t pin_num, uint32_t value)
 {
     if (PSP_GPIO_NUM_GPIO_PINS <= pin_num)
     {
-        return; // invalid pin number, do nothing
+        // invalid pin number, do nothing
+        return;
     }
-    else
+    else /* it is a valid pin */
     {
         // a non-zero value means we want to write to the SET register, zero means CLR register
         uint32_t GPIO_SET_OR_CLR_ADDR = value ? PSP_GPIO_GPSET0_A : PSP_GPIO_GPCLR0_A;
@@ -422,9 +424,10 @@ uint32_t PSP_GPIO_Read_Pin(uint32_t pin_num)
 
     if (PSP_GPIO_NUM_GPIO_PINS <= pin_num)
     {
-        result = 0u; // invalid pin number, return 0
+        // invalid pin number, return 0
+        result = 0u;
     }
-    else
+    else /* it is a valid pin */
     {
         // find the position of the bit in the GPLEV register that contains the pin reading
         const uint32_t PIN_POSITION = pin_num & HIGHEST_BIT_POSITION_IN_A_REGISTER;
@@ -434,9 +437,112 @@ uint32_t PSP_GPIO_Read_Pin(uint32_t pin_num)
         {
             result = PSP_GPIO_GPLEV0_R >> PIN_POSITION;
         }
-        else
+        else /* the pin goes in the second bank of pin registers */
         {
             result = PSP_GPIO_GPLEV1_R >> PIN_POSITION;
+        }
+
+        result &= 1u; // clear out any bits besides the lsb, the result is now either 0 or 1
+    }
+
+    return result;
+}
+
+
+
+void PSP_GPIO_Pin_Enable_Edge_Detect(uint32_t pin_num, PSP_GPIO_Edge_Detect_t edge)
+{
+    if (PSP_GPIO_NUM_GPIO_PINS <= pin_num)
+    {
+        // invalid pin number, do nothing
+        return;
+    }
+    else /* it is a valid pin */
+    {
+        const uint32_t PIN_POSITION = pin_num & HIGHEST_BIT_POSITION_IN_A_REGISTER;
+
+        if (pin_num <= HIGHEST_BIT_POSITION_IN_A_REGISTER)
+        {
+            if (edge == GPIO_EDGE_TYPE_RISING)
+            {
+                PSP_GPIO_GPREN0_R |=  (1u << PIN_POSITION); // set rising edge 
+                PSP_GPIO_GPFEN0_R &= ~(1u << PIN_POSITION); // clear falling edge
+            }
+            else if (edge == GPIO_EDGE_TYPE_FALLING)
+            {
+                PSP_GPIO_GPREN0_R &= ~(1u << PIN_POSITION); // clear rising edge
+                PSP_GPIO_GPFEN0_R |=  (1u << PIN_POSITION); // set falling edge
+            }
+            else if (edge == GPIO_EDGE_TYPE_CHANGING)
+            {
+                PSP_GPIO_GPREN0_R |= (1u << PIN_POSITION); // set rising edge
+                PSP_GPIO_GPFEN0_R |= (1u << PIN_POSITION); // set falling edge
+            }
+            else if (edge == GPIO_EDGE_TYPE_NO_EDGE)
+            {
+                PSP_GPIO_GPREN0_R &= ~(1u << PIN_POSITION); // clear rising edge
+                PSP_GPIO_GPFEN0_R &= ~(1u << PIN_POSITION); // clear falling edge
+            }
+            
+        }
+        else /* the pin goes in the second bank of pin registers */
+        {
+            if (edge == GPIO_EDGE_TYPE_RISING)
+            {
+                PSP_GPIO_GPREN1_R |=  (1u << PIN_POSITION); // set rising edge 
+                PSP_GPIO_GPFEN1_R &= ~(1u << PIN_POSITION); // clear falling edge
+            }
+            else if (edge == GPIO_EDGE_TYPE_FALLING)
+            {
+                PSP_GPIO_GPREN1_R &= ~(1u << PIN_POSITION); // clear rising edge
+                PSP_GPIO_GPFEN1_R |=  (1u << PIN_POSITION); // set falling edge
+            }
+            else if (edge == GPIO_EDGE_TYPE_CHANGING)
+            {
+                PSP_GPIO_GPREN1_R |= (1u << PIN_POSITION); // set rising edge
+                PSP_GPIO_GPFEN1_R |= (1u << PIN_POSITION); // set falling edge
+            }
+            else if (edge == GPIO_EDGE_TYPE_NO_EDGE)
+            {
+                PSP_GPIO_GPREN1_R &= ~(1u << PIN_POSITION); // clear rising edge
+                PSP_GPIO_GPFEN1_R &= ~(1u << PIN_POSITION); // clear falling edge
+            }
+        }
+    }
+}
+
+
+
+uint32_t PSP_GPIO_Event_Detected(uint32_t pin_num)
+{
+    uint32_t result;
+
+    if (PSP_GPIO_NUM_GPIO_PINS <= pin_num)
+    {
+        // invalid pin number, return 0
+        result = 0u;
+    }
+    else /* it is a valid pin */
+    {
+        // find the position of the bit in the GPEDS register that contains the edge detect status
+        const uint32_t PIN_POSITION = pin_num & HIGHEST_BIT_POSITION_IN_A_REGISTER;
+
+        // shift the correct GPEDS register right until the bit of interest is in the lsb
+        if (pin_num <= HIGHEST_BIT_POSITION_IN_A_REGISTER)
+        {
+            // move the relevant bit into the lsb
+            result = PSP_GPIO_GPEDS0_R >> PIN_POSITION;
+            
+            // clear the event
+            PSP_GPIO_GPEDS0_R |= (1u << PIN_POSITION);
+        }
+        else /* the pin goes in the second bank of pin registers */
+        {
+            // move the relevant bit into the lsb
+            result = PSP_GPIO_GPEDS1_R >> PIN_POSITION;
+            
+            // clear the event
+            PSP_GPIO_GPEDS1_R |= (1u << PIN_POSITION);
         }
 
         result &= 1u; // clear out any bits besides the lsb, the result is now either 0 or 1
