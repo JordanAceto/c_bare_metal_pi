@@ -129,8 +129,6 @@ void BSP_ILI9341_Send_Pixel_Data(uint16_t x, uint16_t y, uint16_t color)
 // note: init function is in a messy and silly state, just for testing currently
 void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num)
 {
-    // PSP_Time_Delay_Microseconds(1000000u);
-
     // set up the d/c pin
     DC_PIN = dc_pin_num;
     PSP_GPIO_Set_Pin_Mode(DC_PIN, PSP_GPIO_PINMODE_OUTPUT);
