@@ -137,9 +137,8 @@ void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num)
 
     // start SPI 0, use chip select pin 0
     PSP_SPI0_Start();
-    // clock div 4 = 62.5MHz works, clock div of 2 didn't seem to work
-    // experimentation needed to find best clock speed
-    PSP_SPI0_Set_Clock_Divider(PSP_SPI0_Clock_Divider_4);
+    // clock div 8 = 32.2MHz, faster speeds seemed to have problems, TODO: investigate
+    PSP_SPI0_Set_Clock_Divider(PSP_SPI0_Clock_Divider_8);
     PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_0);
 
     // sw reset means we don't need to use up a pin for the reset line
