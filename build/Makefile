@@ -1,12 +1,15 @@
 
 ARMGNU ?= arm-none-eabi
 
-SRC_DIR = src/
-BUILD_DIR = bin/
+ROOT_DIR  = ../
 
-CFLAGS = -Wall -O2 -Iapi -ffreestanding -nostdinc -nostartfiles
+API_DIR   = $(ROOT_DIR)api/
+SRC_DIR   = $(ROOT_DIR)src/
+BUILD_DIR = $(ROOT_DIR)bin/
 
-TARGET = kernel.img
+CFLAGS = -Wall -O2 -I$(API_DIR) -ffreestanding -nostdinc -nostartfiles
+
+TARGET = $(ROOT_DIR)kernel.img
 
 LINKER = linker.ld
 
