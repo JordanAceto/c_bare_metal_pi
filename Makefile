@@ -1,4 +1,3 @@
-# source: https://github.com/bztsrc/raspi3-tutorial
 
 ARMGNU ?= arm-none-eabi
 
