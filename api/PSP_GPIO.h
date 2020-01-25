@@ -6,7 +6,7 @@
  *      are set to outputs.
  * 
  * NOTES:
- *      TODO: Add edge detection functionality.
+ *      TODO: Test edge detection functionality.
  * 
  * REFERENCES:
  *      BCM2837-ARM-Peripherals.pdf page 89
