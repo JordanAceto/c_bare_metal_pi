@@ -53,7 +53,7 @@ typedef struct Rotary_Encoder_Type
 
     BSP_Rotary_Encoder_State_t state;
 
-    uint32_t count;
+    int32_t count;
 
 } BSP_Rotary_Encoder_t;
 
