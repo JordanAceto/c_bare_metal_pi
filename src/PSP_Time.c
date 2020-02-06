@@ -57,3 +57,27 @@ void PSP_Time_Delay_Microseconds(const uint32_t delay_time_uSec)
         // wait
     }
 }
+
+
+
+void PSP_Time_Initialize_Timer_Counter(PSP_Time_Timeout_Counter * pCounter)
+{
+    pCounter->timeout_time_uSec = PSP_Time_Get_Ticks() + pCounter->timeout_period_uSec;
+}
+
+
+
+uint32_t PSP_Time_Poll_Timeout_Counter(PSP_Time_Timeout_Counter * pCounter)
+{
+    const uint64_t TIME_NOW = PSP_Time_Get_Ticks();
+
+    uint32_t retval = 0;
+
+    if (TIME_NOW > pCounter->timeout_time_uSec)
+    {
+        pCounter->timeout_time_uSec = TIME_NOW + pCounter->timeout_period_uSec;
+        retval = 1u;
+    }
+
+    return retval;
+}
