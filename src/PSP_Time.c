@@ -1,54 +1,106 @@
+/*
+--|----------------------------------------------------------------------------|
+--| FILE DESCRIPTION:
+--|   PSP_Time.c provides the register addresses and pointers for the system
+--|   timer as well as the implementation for the various timer functions.
+--|
+--|----------------------------------------------------------------------------|
+--| REFERENCES:
+--|   BCM2837-ARM-Peripherals.pdf page 172
+--|
+--|----------------------------------------------------------------------------|
+*/
+
+/*
+--|----------------------------------------------------------------------------|
+--| INCLUDE FILES
+--|----------------------------------------------------------------------------|
+*/
 
 #include "PSP_Time.h"
 #include "PSP_REGS.h"
 
-/*-----------------------------------------------------------------------------------------------
-    Private PSP_Time Defines
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE DEFINES
+--|----------------------------------------------------------------------------|
+*/
 
-// Register Addresses
-#define PSP_Time_BASE_ADDRESS (PSP_REGS_SYSCLK_BASE_ADDRESS)        // base address of System Timer Register
+/*
+--| NAME: System_Timer
+--| DESCRIPTION: pointer to the 64 bit system timer
+--| TYPE: PSP_Time_System_Timer_t *
+*/
+#define System_Timer ((volatile PSP_Time_System_Timer_t *)PSP_REGS_SYSCLK_BASE_ADDRESS)
 
-#define PSP_Time_CS_A         (PSP_Time_BASE_ADDRESS | 0x00000000u) // System Timer Control/Status address
-#define PSP_Time_CLO_A        (PSP_Time_BASE_ADDRESS | 0x00000004u) // System Timer Counter Lower 32 bits address
-#define PSP_Time_CHI_A        (PSP_Time_BASE_ADDRESS | 0x00000008u) // System Timer Counter Higher 32 bits address
-#define PSP_Time_C0_A         (PSP_Time_BASE_ADDRESS | 0x0000000Cu) // System Timer Compare 0 address
-#define PSP_Time_C1_A         (PSP_Time_BASE_ADDRESS | 0x00000010u) // System Timer Compare 1 address
-#define PSP_Time_C2_A         (PSP_Time_BASE_ADDRESS | 0x00000014u) // System Timer Compare 2 address
-#define PSP_Time_C3_A         (PSP_Time_BASE_ADDRESS | 0x00000018u) // System Timer Compare 3 address
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE TYPES
+--|----------------------------------------------------------------------------|
+*/
 
-// Register Pointers
-#define PSP_Time_CS_R         (*((vuint32_t *)PSP_Time_CS_A))       // System Timer Control/Status register
-#define PSP_Time_CLO_R        (*((vuint32_t *)PSP_Time_CLO_A))      // System Timer Counter Lower 32 bits register
-#define PSP_Time_CHI_R        (*((vuint32_t *)PSP_Time_CHI_A))      // System Timer Counter Higher 32 bits register
-#define PSP_Time_C0_R         (*((vuint32_t *)PSP_Time_C0_A))       // System Timer Compare 0 register
-#define PSP_Time_C1_R         (*((vuint32_t *)PSP_Time_C1_A))       // System Timer Compare 1 register
-#define PSP_Time_C2_R         (*((vuint32_t *)PSP_Time_C2_A))       // System Timer Compare 2 register
-#define PSP_Time_C3_R         (*((vuint32_t *)PSP_Time_C3_A))       // System Timer Compare 3 register
+/*
+--| NAME: PSP_Time_System_Timer_t
+--| DESCRIPTION: structure for the 64 bit system timer registers
+*/
+typedef struct PSP_Time_System_Timer_Type
+{
+    vuint32_t CS;  // System Timer Control/Status
+    vuint32_t CLO; // System Timer Counter Lower 32 bits
+    vuint32_t CHI; // System Timer Counter Higher 32 bits
+    vuint32_t C0;  // System Timer Compare 0
+    vuint32_t C1;  // System Timer Compare 1
+    vuint32_t C2;  // System Timer Compare 2
+    vuint32_t C3;  // System Timer Compare 3
+} PSP_Time_System_Timer_t;
 
 
-/*-----------------------------------------------------------------------------------------------
-    PSP_Time Function Definitions
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE CONSTANTS
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE VARIABLES
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION PROTOTYPES
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PUBLIC FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
 
 uint64_t PSP_Time_Get_Ticks(void)
 {
-    uint32_t CHI_reading = PSP_Time_CHI_R;
-    uint32_t CLO_reading = PSP_Time_CLO_R;
+    volatile uint32_t CHI_reading = System_Timer->CHI;
+    volatile uint32_t CLO_reading = System_Timer->CLO;
 
     // if the upper 32 bit reading has changed, take new readings
-    if (CHI_reading != PSP_Time_CHI_R)
+    if (CHI_reading != System_Timer->CHI)
     {
-        CHI_reading = PSP_Time_CHI_R;
-        CLO_reading = PSP_Time_CLO_R;
+        CHI_reading = System_Timer->CHI;
+        CLO_reading = System_Timer->CLO;
     }
 
     return (uint64_t)CHI_reading << 32u | CLO_reading;
 }
 
-
-
-void PSP_Time_Delay_Microseconds(const uint32_t delay_time_uSec)
+void PSP_Time_Delay_Microseconds(uint32_t delay_time_uSec)
 {
     const uint64_t end_time = PSP_Time_Get_Ticks() + delay_time_uSec;
 
@@ -58,26 +110,28 @@ void PSP_Time_Delay_Microseconds(const uint32_t delay_time_uSec)
     }
 }
 
-
-
-void PSP_Time_Initialize_Timer_Counter(PSP_Time_Timeout_Counter * pCounter)
+void PSP_Time_Initialize_Timer_Counter(PSP_Time_Periodic_Timer_t * pCounter)
 {
-    pCounter->timeout_time_uSec = PSP_Time_Get_Ticks() + pCounter->timeout_period_uSec;
+    pCounter->last_timeout_time_uSec = PSP_Time_Get_Ticks();
 }
 
-
-
-uint32_t PSP_Time_Poll_Timeout_Counter(PSP_Time_Timeout_Counter * pCounter)
+uint32_t PSP_Time_Periodic_Timer_Timeout_Occured(PSP_Time_Periodic_Timer_t * pCounter)
 {
-    const uint64_t TIME_NOW = PSP_Time_Get_Ticks();
-
     uint32_t retval = 0;
 
-    if (TIME_NOW > pCounter->timeout_time_uSec)
+    if ((PSP_Time_Get_Ticks() - pCounter->last_timeout_time_uSec) > pCounter->timeout_period_uSec)
     {
-        pCounter->timeout_time_uSec = TIME_NOW + pCounter->timeout_period_uSec;
+        pCounter->last_timeout_time_uSec = PSP_Time_Get_Ticks();
         retval = 1u;
     }
 
     return retval;
 }
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
