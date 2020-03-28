@@ -1,61 +1,133 @@
+/*
+--|----------------------------------------------------------------------------|
+--| FILE DESCRIPTION:
+--|   PSP_I2C.c provides the implementation for I2C.
+--|  
+--|----------------------------------------------------------------------------|
+--| REFERENCES:
+--|   BCM2837-ARM-Peripherals.pdf page 28
+--|
+--|----------------------------------------------------------------------------|
+*/
 
-#include "PSP_I2C.h"
+/*
+--|----------------------------------------------------------------------------|
+--| INCLUDE FILES
+--|----------------------------------------------------------------------------|
+*/
+
 #include "PSP_GPIO.h"
+#include "PSP_I2C.h"
 #include "PSP_REGS.h"
 
-/*-----------------------------------------------------------------------------------------------
-    Private PSP_I2C Defines
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE DEFINES
+--|----------------------------------------------------------------------------|
+*/
 
-// I2C Register Addresses
-#define PSP_I2C_BASE_A     (PSP_REGS_I2C_BASE_ADDRESS)
-#define PSP_I2C_C_A        (PSP_I2C_BASE_A | 0x00000000u)   // control register address
-#define PSP_I2C_S_A        (PSP_I2C_BASE_A | 0x00000004u)   // status register address
-#define PSP_I2C_DLEN_A     (PSP_I2C_BASE_A | 0x00000008u)   // data length register address
-#define PSP_I2C_SA_A       (PSP_I2C_BASE_A | 0x0000000Cu)   // slave address register address
-#define PSP_I2C_FIFO_A     (PSP_I2C_BASE_A | 0x00000010u)   // data FIFO register address
-#define PSP_I2C_DIV_A      (PSP_I2C_BASE_A | 0x00000014u)   // clock divider register address
-#define PSP_I2C_DEL_A      (PSP_I2C_BASE_A | 0x00000018u)   // data delay register address
-#define PSP_I2C_CLKT_A     (PSP_I2C_BASE_A | 0x0000001Cu)   // clock stretch timeout register address
+/*
+--| NAME: I2C
+--| DESCRIPTION: pointer to the I2C structure
+--| TYPE: I2C_t *
+*/
+#define I2C ((volatile I2C_t *)PSP_REGS_I2C_BASE_ADDRESS)
 
-// I2C Register Pointers
-#define PSP_I2C_C_R        (*((vuint32_t *)PSP_I2C_C_A))    // control register
-#define PSP_I2C_S_R        (*((vuint32_t *)PSP_I2C_S_A))    // status register
-#define PSP_I2C_DLEN_R     (*((vuint32_t *)PSP_I2C_DLEN_A)) // data length register
-#define PSP_I2C_SA_R       (*((vuint32_t *)PSP_I2C_SA_A))   // slave address register
-#define PSP_I2C_FIFO_R     (*((vuint32_t *)PSP_I2C_FIFO_A)) // data FIFO register
-#define PSP_I2C_DIV_R      (*((vuint32_t *)PSP_I2C_DIV_A))  // clock divider register
-#define PSP_I2C_DEL_R      (*((vuint32_t *)PSP_I2C_DEL_A))  // data delay register
-#define PSP_I2C_CLKT_R     (*((vuint32_t *)PSP_I2C_CLKT_A)) // clock stretch timeout register
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE TYPES
+--|----------------------------------------------------------------------------|
+*/
 
-// masks for I2C control register
-#define I2C_C_I2CEN        0x00008000u // I2C Enable, 0 = disabled, 1 = enabled
-#define I2C_C_INTR         0x00000400u // Interrupt on RX
-#define I2C_C_INTT         0x00000200u // Interrupt on TX
-#define I2C_C_INTD         0x00000100u // Interrupt on DONE
-#define I2C_C_ST           0x00000080u // Start transfer, 1 = Start a new transfer
-#define I2C_C_CLEAR_1      0x00000020u // Clear FIFO Clear
-#define I2C_C_CLEAR_2      0x00000010u // Clear FIFO Clear
-#define I2C_C_READ         0x00000001u // Read transfer
+/*
+--| NAME: I2C_t
+--| DESCRIPTION: structure for I2C registers
+*/
+typedef struct I2C_Type
+{
+    vuint32_t C;    // Control
+    vuint32_t S;    // Status
+    vuint32_t DLEN; // Data Length
+    vuint32_t A;    // Slave Address
+    vuint32_t FIFO; // Data FIFO
+    vuint32_t DIV;  // Clock Divider
+    vuint32_t DEL;  // Data Delay
+    vuint32_t CLKT; // Clock Stretch Timeout
+} I2C_t;
 
-// masks for I2C status register
-#define I2C_S_CLKT         0x00000200u // Clock stretch timeout
-#define I2C_S_ERR          0x00000100u // 0 = No errors detected. 1 = Slave has not acknowledged its address.
-#define I2C_S_RXF          0x00000080u // RXF FIFO full, 0 = FIFO is not full, 1 = FIFO is full
-#define I2C_S_TXE          0x00000040u // TXE FIFO full, 0 = FIFO is not full, 1 = FIFO is full
-#define I2C_S_RXD          0x00000020u // RXD FIFO contains data
-#define I2C_S_TXD          0x00000010u // TXD FIFO can accept data
-#define I2C_S_RXR          0x00000008u // RXR FIFO needs reading (full)
-#define I2C_S_TXW          0x00000004u // TXW FIFO needs writing (full)
-#define I2C_S_DONE         0x00000002u // Transfer DONE
-#define I2C_S_TA           0x00000001u // Transfer Active
+/*
+--| NAME: I2C_C_Flags_enum
+--| DESCRIPTION: I2C Control register flags
+*/
+typedef enum I2C_C_Flags_Enumeration
+{
+    I2C_C_I2CEN_FLAG = (1u << 15u), // I2C Enable [rw]
+    I2C_C_INTR_FLAG  = (1u << 10u), // INTR Interrupt on RX [rw]
+    I2C_C_INTT_FLAG  = (1u << 9u),  // INTT Interrupt on TX [rw]
+    I2C_C_INTD_FLAG  = (1u << 8u),  // INTD Interrupt on DONE [rw]
+    I2C_C_ST_FLAG    = (1u << 7u),  // ST Start Transfer [rw]
+    I2C_C_READ_FLAG  = (1u << 0u),  // READ Read Transfer [rw]
+} I2C_C_Flags_enum;
 
+/*
+--| NAME: I2C_C_CLEAR_Masks_enum
+--| DESCRIPTION: I2C Control register CLEAR masks [2 bits, rw]
+*/
+typedef enum I2C_C_CLEAR_Masks_Enumeration
+{
+    I2C_C_CLEAR_NO_ACTION = 0b00u, // No action
+    I2C_C_CLEAR_FIFO      = 0b01u, // Clear FIFO. One shot operation
+    I2C_C_CLEAR_FIFO_2    = 0b10u, // Clear FIFO. (2 bits are used to maintain compatibility to previous version)
+    I2C_C_CLEAR_SHIFT_AMT = 4u,    // position of CLEAR in SPI0 CS
+} I2C_C_CLEAR_Masks_enum;
 
+/*
+--| NAME: I2C_S_Flags_enum
+--| DESCRIPTION: I2C Status register flags
+*/
+typedef enum I2C_S_Flags_Enumeration
+{
+    I2C_S_CLKT_FLAG = (1u << 9u), // CLKT Clock Stretch Timeout [rw]
+    I2C_S_ERR_FLAG  = (1u << 8u), // ERR ACK Error [rw]
+    I2C_S_RXF_FLAG  = (1u << 7u), // RXF - FIFO Full [r0]
+    I2C_S_TXE_FLAG  = (1u << 6u), // TXE - FIFO Empty [r0]
+    I2C_S_RXD_FLAG  = (1u << 5u), // RXD - FIFO contains Data [r0]
+    I2C_S_TXD_FLAG  = (1u << 4u), // TXD - FIFO can accept Data [r0]
+    I2C_S_RXR_FLAG  = (1u << 3u), // RXR - FIFO needs Reading (full) [r0]
+    I2C_S_TXW_FLAG  = (1u << 2u), // TXW - FIFO needs Writing (full) [r0]
+    I2C_S_DONE_FLAG = (1u << 1u), // DONE Transfer Done [rw]
+    I2C_S_TA_FLAG   = (1u << 0u), // TA Transfer Active [r0]
+} I2C_S_Flags_enum;
 
-/*-----------------------------------------------------------------------------------------------
-    PSP_I2C Function Definitions
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE CONSTANTS
+--|----------------------------------------------------------------------------|
+*/
 
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE VARIABLES
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION PROTOTYPES
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PUBLIC FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
 
 void PSP_I2C_Start(void)
 {
@@ -63,53 +135,53 @@ void PSP_I2C_Start(void)
     PSP_GPIO_Set_Pin_Mode(I2C_SCL_PIN, PSP_GPIO_PINMODE_ALT0);
 }
 
-
-
- void PSP_I2C_End(void)
- {
+void PSP_I2C_End(void)
+{
     PSP_GPIO_Set_Pin_Mode(I2C_SDA_PIN, PSP_GPIO_PINMODE_INPUT);
     PSP_GPIO_Set_Pin_Mode(I2C_SCL_PIN, PSP_GPIO_PINMODE_INPUT);
- }
-
-
+}
 
 void PSP_I2C_Set_Clock_Divider(uint32_t divider)
 {
-    PSP_I2C_DIV_R = divider;
+    I2C->DIV = divider;
 }
-
-
 
 void PSP_I2C_Set_Slave_Address(uint32_t address)
 {
-    PSP_I2C_SA_R = address;
+    I2C->A = address;
 }
-
-
 
 void PSP_I2C_Write_Byte(uint8_t val)
 {
     // clear the fifo
-    PSP_I2C_C_R |= I2C_C_CLEAR_1;
+    I2C->C |= I2C_C_CLEAR_FIFO << I2C_C_CLEAR_SHIFT_AMT;
 
     // clear the clock stretch timeout, no acknowledge error, and transfer done status flags 
     // note that these flags are cleared by writing a 1
-    PSP_I2C_S_R |= I2C_S_CLKT | I2C_S_ERR | I2C_S_DONE;
+    I2C->S |= I2C_S_CLKT_FLAG | I2C_S_ERR_FLAG | I2C_S_DONE_FLAG;
     
     // set data length to 1 byte
-    PSP_I2C_DLEN_R = 1u;
+    I2C->DLEN = 1u;
 
     // write the value to the fifo
-    PSP_I2C_FIFO_R = val;
+    I2C->FIFO = val;
     
     // enable device and start transfer
-    PSP_I2C_C_R |= I2C_C_I2CEN | I2C_C_ST;
+    I2C->C |= I2C_C_I2CEN_FLAG | I2C_C_ST_FLAG;
 
-    while (!(PSP_I2C_S_R & I2C_S_DONE))
+    while (!(I2C->S & I2C_S_DONE_FLAG))
     {
         // wait for transfer to complete
     }
 
     // set the done flag inorder to clear it and end the transfer
-    PSP_I2C_S_R |= I2C_S_DONE;
+    I2C->S |= I2C_S_DONE_FLAG;
 }
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
