@@ -1,65 +1,143 @@
+/*
+--|----------------------------------------------------------------------------|
+--| FILE DESCRIPTION:
+--|   PSP_SPI_0.c provides the implementation for SPI 0 communication.
+--|   
+--|----------------------------------------------------------------------------|
+--| REFERENCES:
+--|   BCM2837-ARM-Peripherals.pdf page 148
+--|
+--|----------------------------------------------------------------------------|
+*/
 
-#include "PSP_SPI_0.h"
+/*
+--|----------------------------------------------------------------------------|
+--| INCLUDE FILES
+--|----------------------------------------------------------------------------|
+*/
+
 #include "PSP_GPIO.h"
-
 #include "PSP_REGS.h"
+#include "PSP_SPI_0.h"
 
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE DEFINES
+--|----------------------------------------------------------------------------|
+*/
 
-/*-----------------------------------------------------------------------------------------------
-    Private PSP_SPI_0 Defines
- -------------------------------------------------------------------------------------------------*/
+/*
+--| NAME: SPI_0
+--| DESCRIPTION: pointer to the SPI 0 register structure
+--| TYPE: SPI_0_t *
+*/
+#define SPI_0 ((volatile SPI_0_t *)PSP_REGS_SPI_0_BASE_ADDRESS)
 
-// SPI 0 Register Addresses
-#define PSP_SPI_0_BASE_A      (PSP_REGS_SPI_0_BASE_ADDRESS) 
-#define PSP_SPI_0_CS_A        (PSP_SPI_0_BASE_A | 0x00000000u)   // SPI Master Control and Status address
-#define PSP_SPI_0_FIFO_A      (PSP_SPI_0_BASE_A | 0x00000004u)   // SPI Master TX and RX FIFOs address
-#define PSP_SPI_0_CLK_A       (PSP_SPI_0_BASE_A | 0x00000008u)   // SPI Master Clock Divider address
-#define PSP_SPI_0_DLEN_A      (PSP_SPI_0_BASE_A | 0x0000000Cu)   // SPI Master Data Length address
-#define PSP_SPI_0_LTOH_A      (PSP_SPI_0_BASE_A | 0x00000010u)   // SPI LOSSI mode TOH address
-#define PSP_SPI_0_DC_A        (PSP_SPI_0_BASE_A | 0x00000014u)   // SPI DMA DREQ Controls address
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE TYPES
+--|----------------------------------------------------------------------------|
+*/
 
-// SPI 0 Register Pointers
-#define PSP_SPI_0_CS_R        (*((vuint32_t *)PSP_SPI_0_CS_A))   // SPI Master Control and Status register
-#define PSP_SPI_0_FIFO_R      (*((vuint32_t *)PSP_SPI_0_FIFO_A)) // SPI Master TX and RX FIFOs register
-#define PSP_SPI_0_CLK_R       (*((vuint32_t *)PSP_SPI_0_CLK_A))  // SPI Master Clock Divider register
-#define PSP_SPI_0_DLEN_R      (*((vuint32_t *)PSP_SPI_0_DLEN_A)) // SPI Master Data Length register
-#define PSP_SPI_0_LTOH_R      (*((vuint32_t *)PSP_SPI_0_LTOH_A)) // SPI LOSSI mode TOH register
-#define PSP_SPI_0_DC_R        (*((vuint32_t *)PSP_SPI_0_DC_A))   // SPI DMA DREQ Controls register
+/*
+--| NAME: SPI_0_t
+--| DESCRIPTION: structure for the SPI 0 registers
+*/
+typedef struct SPI_0_Type
+{
+    vuint32_t CS;   // SPI Master Control and Status
+    vuint32_t FIFO; // SPI Master TX and RX FIFOs
+    vuint32_t CLK;  // SPI Master Clock Divider
+    vuint32_t DLEN; // SPI Master Data Length
+    vuint32_t LTOH; // SPI LOSSI mode TOH
+    vuint32_t DC;   // SPI DMA DREQ Controls
+} SPI_0_t;
 
-// SPI 0 Control Register Masks
-#define SPI_0_CS_LEN_LONG   0x02000000u  // Enable Long data word in Lossi mode if DMA_LEN is set
-#define SPI_0_CS_DMA_LEN    0x01000000u  // Enable DMA mode in Lossi mode
-#define SPI_0_CS_CSPOL2     0x00800000u  // Chip Select 2 Polarity
-#define SPI_0_CS_CSPOL1     0x00400000u  // Chip Select 1 Polarity
-#define SPI_0_CS_CSPOL0     0x00200000u  // Chip Select 0 Polarity
-#define SPI_0_CS_RXF        0x00100000u  // RXF - RX FIFO Full
-#define SPI_0_CS_RXR        0x00080000u  // RXR RX FIFO needs Reading ( full)
-#define SPI_0_CS_TXD        0x00040000u  // TXD TX FIFO can accept Data
-#define SPI_0_CS_RXD        0x00020000u  // RXD RX FIFO contains Data
-#define SPI_0_CS_DONE       0x00010000u  // Done transfer Done
-#define SPI_0_CS_TE_EN      0x00008000u  // Unused
-#define SPI_0_CS_LMONO      0x00004000u  // Unused
-#define SPI_0_CS_LEN        0x00002000u  // LEN LoSSI enable
-#define SPI_0_CS_REN        0x00001000u  // REN Read Enable
-#define SPI_0_CS_ADCS       0x00000800u  // ADCS Automatically Deassert Chip Select
-#define SPI_0_CS_INTR       0x00000400u  // INTR Interrupt on RXR
-#define SPI_0_CS_INTD       0x00000200u  // INTD Interrupt on Done
-#define SPI_0_CS_DMAEN      0x00000100u  // DMAEN DMA Enable
-#define SPI_0_CS_TA         0x00000080u  // Transfer Active
-#define SPI_0_CS_CSPOL      0x00000040u  // Chip Select Polarity
-#define SPI_0_CS_CLEAR1     0x00000020u  // CLEAR FIFO Clear 1
-#define SPI_0_CS_CLEAR2     0x00000010u  // CLEAR FIFO Clear 2
-#define SPI_0_CS_CPOL       0x00000008u  // Clock Polarity
-#define SPI_0_CS_CPHA       0x00000004u  // Clock Phase
-#define SPI_0_CS_CS1        0x00000002u  // Chip Select 1
-#define SPI_0_CS_CS2        0x00000001u  // Chip Select 2
+/*
+--| NAME: SPI_0_CS_Flags_enum
+--| DESCRIPTION: SPI 0 Master Control and Status register flags
+*/
+typedef enum SPI_0_CS_Flags_Enumeration
+{
+    SPI_0_CS_LEN_LONG_FLAG = (1u << 25u),  // Enable Long data word in Lossi mode if DMA_LEN is set [rw]
+    SPI_0_CS_DMA_LEN_FLAG  = (1u << 24u),  // Enable DMA mode in Lossi mode [rw]
+    SPI_0_CS_CSPOL2_FLAG   = (1u << 23u),  // Chip Select 2 Polarity [rw]
+    SPI_0_CS_CSPOL1_FLAG   = (1u << 22u),  // Chip Select 1 Polarity [rw]
+    SPI_0_CS_CSPOL0_FLAG   = (1u << 21u),  // Chip Select 0 Polarity [rw]
+    SPI_0_CS_RXF_FLAG      = (1u << 20u),  // RXF - RX FIFO Full [r0]
+    SPI_0_CS_RXR_FLAG      = (1u << 19u),  // RXR RX FIFO needs Reading (full) [r0]
+    SPI_0_CS_TXD_FLAG      = (1u << 18u),  // TXD TX FIFO can accept Data [r0]
+    SPI_0_CS_RXD_FLAG      = (1u << 17u),  // RXD RX FIFO contains Data [r0]
+    SPI_0_CS_DONE_FLAG     = (1u << 16u),  // Done transfer Done [r0]
+    SPI_0_CS_TE_EN_FLAG    = (1u << 15u),  // Unused 
+    SPI_0_CS_LMONO_FLAG    = (1u << 14u),  // Unused
+    SPI_0_CS_LEN_FLAG      = (1u << 13u),  // LEN LoSSI enable [rw]
+    SPI_0_CS_REN_FLAG      = (1u << 12u),  // REN Read Enable [rw]
+    SPI_0_CS_ADCS_FLAG     = (1u << 11u),  // ADCS Automatically Deassert Chip Select [rw]
+    SPI_0_CS_INTR_FLAG     = (1u << 10u),  // INTR Interrupt on RXR [rw]
+    SPI_0_CS_INTD_FLAG     = (1u << 9u),   // INTD Interrupt on Done [rw]
+    SPI_0_CS_DMAEN_FLAG    = (1u << 8u),   // DMAEN DMA Enable [rw]
+    SPI_0_CS_TA_FLAG       = (1u << 7u),   // Transfer Active [rw]
+    SPI_0_CS_CSPOL_FLAG    = (1u << 6u),   // Chip Select Polarity [rw]
+    SPI_0_CS_CPOL_FLAG     = (1u << 3u),   // Clock Polarity [rw]
+    SPI_0_CS_CPHA_FLAG     = (1u << 2u),   // Clock Phase [rw]
+} SPI_0_CS_Flags_enum;
 
+/*
+--| NAME: SPI_0_CS_CLEAR_Masks_enum
+--| DESCRIPTION: SPI 0 CS CLEAR masks
+*/
+typedef enum SPI_0_CS_CLEAR_Masks_Enumeration
+{
+    SPI_0_CS_CLEAR_NO_ACTION      = 0b00u, // No action
+    SPI_0_CS_CLEAR_TX_FIFO        = 0b01u, // Clear TX FIFO. One shot operation
+    SPI_0_CS_CLEAR_RX_FIFO        = 0b10u, // Clear RX FIFO. One shot operation
+    SPI_0_CS_CLEAR_RX_AND_TX_FIFO = 0b11u, // Clear both. One shot operation
+    SPI_0_CS_CLEAR_SHIFT_AMT      = 4u,    // position of CLEAR in SPI0 CS
+} SPI_0_CS_CLEAR_Masks_enum;
 
+/*
+--| NAME: SPI_0_CS_CHIP_SEL_Masks_enum
+--| DESCRIPTION: SPI 0 CS CHIP_SEL masks
+*/
+typedef enum SPI_0_CS_CHIP_SEL_Masks_Enumeration
+{
+    SPI_0_CS_CHIP_SEL_0         = 0b00u, // Chip select 0
+    SPI_0_CS_CHIP_SEL_1         = 0b01u, // Chip select 1
+    SPI_0_CS_CHIP_SEL_2         = 0b10u, // Chip select 2
+    SPI_0_CS_CHIP_SEL_RESERVED  = 0b11u, // reserved
+    SPI_0_CS_CHIP_SEL_SHIFT_AMT = 0u,    // position of CHIP_SEL in SPI0 CS
+} SPI_0_CS_CHIP_SEL_Masks_enum;
 
-/*-----------------------------------------------------------------------------------------------
-    PSP_SPI_0 Function Definitions
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE CONSTANTS
+--|----------------------------------------------------------------------------|
+*/
 
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE VARIABLES
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION PROTOTYPES
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
+
+/*
+--|----------------------------------------------------------------------------|
+--| PUBLIC FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
 
 void PSP_SPI0_Start(void)
 {
@@ -71,16 +149,14 @@ void PSP_SPI0_Start(void)
     PSP_GPIO_Set_Pin_Mode(PSP_SPI_0_CLK_PIN,  PSP_GPIO_PINMODE_ALT0);
 
     // zero out the control/status register
-    PSP_SPI_0_CS_R = 0u;
+    SPI_0->CS = 0u;
 
     // clear the fifos
-    PSP_SPI_0_CS_R = SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
+    SPI_0->CS |= SPI_0_CS_CLEAR_RX_AND_TX_FIFO << SPI_0_CS_CLEAR_SHIFT_AMT;
 
     // default to chip select 0
     PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_0);
 }
-
-
 
 void PSP_SPI0_End(void)
 {
@@ -92,55 +168,45 @@ void PSP_SPI0_End(void)
     PSP_GPIO_Set_Pin_Mode(PSP_SPI_0_CLK_PIN,  PSP_GPIO_PINMODE_INPUT);
 }
 
-
-
 void PSP_SPI0_Set_Clock_Divider(PSP_SPI_0_Clock_Divider_t divider)
 {
-    PSP_SPI_0_CLK_R = divider;
+    SPI_0->CLK = divider;
 }
-
-
 
 void PSP_SPI0_Begin_Transfer(void)
 {
     // clear the fifos
-    PSP_SPI_0_CS_R |= SPI_0_CS_CLEAR1 | SPI_0_CS_CLEAR2;
+    SPI_0->CS |= SPI_0_CS_CLEAR_RX_AND_TX_FIFO << SPI_0_CS_CLEAR_SHIFT_AMT;
 
     // set Transfer Active high to enable transfer
-    PSP_SPI_0_CS_R |= SPI_0_CS_TA;
+    SPI_0->CS |= SPI_0_CS_TA_FLAG;
 }
-
-
 
 void PSP_SPI0_End_Transfer(void)
 {
-    while ((PSP_SPI_0_CS_R & SPI_0_CS_TA) && !(PSP_SPI_0_CS_R & SPI_0_CS_DONE))
+    while ((SPI_0->CS & SPI_0_CS_TA_FLAG) && !(SPI_0->CS & SPI_0_CS_DONE_FLAG))
     {
         // wait for the transfer to complete
     }
 
     // set transfer active low to end the transfer
-    PSP_SPI_0_CS_R &= ~(SPI_0_CS_TA);
+    SPI_0->CS &= ~(SPI_0_CS_TA_FLAG);
 }
-
-
 
 void PSP_SPI0_Send_Byte(uint8_t val)
 {
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_TXD))
+    while (!(SPI_0->CS & SPI_0_CS_TXD_FLAG))
     {
         // wait for TX fifo to be ready to accept data
     }
 
     // write the value into the fifo
-    PSP_SPI_0_FIFO_R = val;
+    SPI_0->FIFO = val;
 }
-
-
 
 void PSP_SPI0_Send_16(uint16_t val)
 {
-    while (!(PSP_SPI_0_CS_R & SPI_0_CS_TXD))
+    while (!(SPI_0->CS & SPI_0_CS_TXD_FLAG))
     {
         // wait for TX fifo to be ready to accept data
     }
@@ -149,11 +215,9 @@ void PSP_SPI0_Send_16(uint16_t val)
     const uint8_t low_byte = val & 0xFFu;
 
     // write the value into the fifo, high byte first
-    PSP_SPI_0_FIFO_R = high_byte;
-    PSP_SPI_0_FIFO_R = low_byte;
+    SPI_0->FIFO = high_byte;
+    SPI_0->FIFO = low_byte;
 }
-
-
 
 uint8_t PSP_SPI0_Transfer_Byte(uint8_t val)
 {
@@ -163,8 +227,6 @@ uint8_t PSP_SPI0_Transfer_Byte(uint8_t val)
     return 0u;
 }
 
-
-
 uint16_t PSP_SPI0_Transfer_16(uint16_t val)
 {
     PSP_SPI0_Begin_Transfer();
@@ -172,8 +234,6 @@ uint16_t PSP_SPI0_Transfer_16(uint16_t val)
     PSP_SPI0_End_Transfer();
     return 0u;
 }
-
-
 
 void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32_t num_bytes)
 {
@@ -186,16 +246,16 @@ void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32
     while ((num_bytes_written < num_bytes) || (num_bytes_read < num_bytes))
     { 
         // the Tx fifo can accept data and there is data to write
-        while((PSP_SPI_0_CS_R & SPI_0_CS_TXD) && (num_bytes_written < num_bytes))
+        while((SPI_0->CS & SPI_0_CS_TXD_FLAG) && (num_bytes_written < num_bytes))
         {
-            PSP_SPI_0_FIFO_R = (uint8_t)p_Tx_buffer[num_bytes_written];
+            SPI_0->FIFO = (uint8_t)p_Tx_buffer[num_bytes_written];
             num_bytes_written++;
         }
 
         // the Rx fifo has data in it and there is data to read
-        while((PSP_SPI_0_CS_R & SPI_0_CS_RXD) && (num_bytes_read < num_bytes))
+        while((SPI_0->CS & SPI_0_CS_RXD_FLAG) && (num_bytes_read < num_bytes))
         {
-            p_Rx_buffer[num_bytes_read] = (uint8_t)PSP_SPI_0_FIFO_R;
+            p_Rx_buffer[num_bytes_read] = (uint8_t)SPI_0->FIFO;
             num_bytes_read++;
         }
     }
@@ -203,9 +263,16 @@ void PSP_SPI0_Buffer_Transfer(uint8_t *p_Tx_buffer, uint8_t *p_Rx_buffer, uint32
     PSP_SPI0_End_Transfer();
 }
 
-
-
 void PSP_SPI0_Set_Chip_Select(PSP_SPI_0_Chip_Select_t chip_select)
 {
-    PSP_SPI_0_CS_R = (PSP_SPI_0_CS_R & 0xFFFFFFFCu) | chip_select;
+    SPI_0->CS &= ~(0b11u);
+    SPI_0->CS |= chip_select;
 }
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
