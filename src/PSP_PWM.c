@@ -1,182 +1,222 @@
+/*
+--|----------------------------------------------------------------------------|
+--| FILE DESCRIPTION:
+--|   PSP_PWM.c provides the implementation for Pulse Width Modulation.
+--|  
+--|----------------------------------------------------------------------------|
+--| REFERENCES:
+--|   see PSP_PWM.h
+--|
+--|----------------------------------------------------------------------------|
+*/
 
+/*
+--|----------------------------------------------------------------------------|
+--| INCLUDE FILES
+--|----------------------------------------------------------------------------|
+*/
+
+#include "PSP_Clock_Manager.h"
+#include "PSP_GPIO.h"
 #include "PSP_PWM.h"
 #include "PSP_REGS.h"
-#include "PSP_GPIO.h"
 
-/*------------------------------------------------------------------------------------------------
-    Private PSP_PWM Defines
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE DEFINES
+--|----------------------------------------------------------------------------|
+*/
 
-// PWM Register Addresses
-#define PSP_PWM_BASE_ADDRESS (PSP_REGS_PWM_BASE_ADDRESS)
+/*
+--| NAME: PWM
+--| DESCRIPTION: pointer to the PWM structure
+--| TYPE: PWM_t *
+*/
+#define PWM ((volatile PWM_t *)PSP_REGS_PWM_BASE_ADDRESS)
 
-#define PSP_PWM_CTL_A        (PSP_PWM_BASE_ADDRESS | 0x00000000u) // PWM control register address
-#define PSP_PWM_STA_A        (PSP_PWM_BASE_ADDRESS | 0x00000004u) // PWM status register address
-#define PSP_PWM_DMAC_A       (PSP_PWM_BASE_ADDRESS | 0x00000008u) // PWM DMA configuration register address
-#define PSP_PWM_RNG1_A       (PSP_PWM_BASE_ADDRESS | 0x00000010u) // PWM channel 1 range address
-#define PSP_PWM_DAT1_A       (PSP_PWM_BASE_ADDRESS | 0x00000014u) // PWM channel 1 data address
-#define PSP_PWM_FIF1_A       (PSP_PWM_BASE_ADDRESS | 0x00000018u) // PWM FIFO input address
-#define PSP_PWM_RNG2_A       (PSP_PWM_BASE_ADDRESS | 0x00000020u) // PWM channel 2 range address
-#define PSP_PWM_DAT2_A       (PSP_PWM_BASE_ADDRESS | 0x00000024u) // PWM channel 2 data address
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE TYPES
+--|----------------------------------------------------------------------------|
+*/
 
-// PWM Register Pointers
-#define PSP_PWM_CTL_R        (*((vuint32_t *)PSP_PWM_CTL_A))      // PWM control register
-#define PSP_PWM_STA_R        (*((vuint32_t *)PSP_PWM_STA_A))      // PWM status register
-#define PSP_PWM_DMAC_R       (*((vuint32_t *)PSP_PWM_DMAC_A))     // PWM DMA configuration register
-#define PSP_PWM_RNG1_R       (*((vuint32_t *)PSP_PWM_RNG1_A))     // PWM channel 1 range register
-#define PSP_PWM_DAT1_R       (*((vuint32_t *)PSP_PWM_DAT1_A))     // PWM channel 1 data register
-#define PSP_PWM_FIF1_R       (*((vuint32_t *)PSP_PWM_FIF1_A))     // PWM FIFO input register
-#define PSP_PWM_RNG2_R       (*((vuint32_t *)PSP_PWM_RNG2_A))     // PWM channel 2 range register
-#define PSP_PWM_DAT2_R       (*((vuint32_t *)PSP_PWM_DAT2_A))     // PWM channel 2 data register
+/*
+--| NAME: PWM_t
+--| DESCRIPTION: structure for PWM registers
+*/
+typedef struct PWM_Type
+{
+    vuint32_t CTL;  // PWM Control
+    vuint32_t STA;  // PWM Status
+    vuint32_t DMAC; // PWM DMA Configuration
+     uint32_t RESERVED_1;
+    vuint32_t RNG1; // PWM Channel 1 Range
+    vuint32_t DAT1; // PWM Channel 1 Data
+    vuint32_t FIF1; // PWM FIFO Input
+     uint32_t RESERVED_2;
+    vuint32_t RNG2; // PWM Channel 2 Range
+    vuint32_t DAT2; // PWM Channel 2 Data
+} PWM_t;
 
-// PWM Control Register Masks
-#define PWM_CTL_MSEN2        0x00008000u                          // Channel 2 M/S Enable
-#define PWM_CTL_USEF2        0x00002000u                          // Channel 2 Use Fifo
-#define PWM_CTL_POLA2        0x00001000u                          // Channel 2 Polarity
-#define PWM_CTL_SBIT2        0x00000800u                          // Channel 2 Silence Bit 
-#define PWM_CTL_RPT2         0x00000400u                          // Channel 2 Repeat Last Data
-#define PWM_CTL_MODE2        0x00000200u                          // Channel 2 Mode
-#define PWM_CTL_PWEN2        0x00000100u                          // Channel 2 Enable 
+/*
+--| NAME: PWM_CTL_Flags_enum
+--| DESCRIPTION: PWM control register flags
+*/
+typedef enum PWM_CTL_Flags_Enumeration
+{   
+    PWM_CTL_MSEN2_FLAG = (1u << 15u), // Channel 2 M/S Enable [rw]
+    PWM_CTL_USEF2_FLAG = (1u << 13u), // Channel 2 Use Fifo [rw]
+    PWM_CTL_POLA2_FLAG = (1u << 12u), // Channel 2 Polarity [rw]
+    PWM_CTL_SBIT2_FLAG = (1u << 11u), // Channel 2 Silence Bit [rw]
+    PWM_CTL_RPTL2_FLAG = (1u << 10u), // Channel 2 Repeat Last Data [rw]
+    PWM_CTL_MODE2_FLAG = (1u << 9u),  // Channel 2 Mode [rw]
+    PWM_CTL_PWEN2_FLAG = (1u << 8u),  // Channel 2 Enable [rw]
+    PWM_CTL_MSEN1_FLAG = (1u << 7u),  // Channel 1 M/S Enable [rw]
+    PWM_CTL_CLRF1_FLAG = (1u << 6u),  // Clear Fifo [r0, w]
+    PWM_CTL_USEF1_FLAG = (1u << 5u),  // Channel 1 Use Fifo [rw]
+    PWM_CTL_POLA1_FLAG = (1u << 4u),  // Channel 1 Polarity [rw]
+    PWM_CTL_SBIT1_FLAG = (1u << 3u),  // Channel 1 Silence Bit [rw]
+    PWM_CTL_RPTL1_FLAG = (1u << 2u),  // Channel 1 Repeat Last Data [rw]
+    PWM_CTL_MODE1_FLAG = (1u << 1u),  // Channel 1 Mode [rw]
+    PWM_CTL_PWEN1_FLAG = (1u << 0u),  // Channel 1 Enable [rw]
+} PWM_CTL_Flags_enum;
 
-#define PWM_CTL_MSEN1        0x00000080u                          // Channel 1 M/S Enable
-#define PWM_CTL_CLRF1        0x00000040u                          // Clear Fifo
-#define PWM_CTL_USEF1        0x00000020u                          // Channel 1 Use Fifo
-#define PWM_CTL_POLA1        0x00000010u                          // Channel 1 Polarity
-#define PWM_CTL_SBIT1        0x00000008u                          // Channel 1 Silence Bit
-#define PWM_CTL_RPTL1        0x00000004u                          // Repeat Last Data
-#define PWM_CTL_MODE1        0x00000002u                          // Channel 1 Mode
-#define PWM_CTL_PWEN1        0x00000001u                          // Channel 1 Enable
+/*
+--| NAME: PWM_STA_Flags_enum
+--| DESCRIPTION: PWM Status register flags
+*/
+typedef enum PWM_STA_Flags_Enumeration
+{   
+    PWM_STA_STA4_FLAG  = (1u << 12u), // Channel 4 State [rw]
+    PWM_STA_STA3_FLAG  = (1u << 11u), // Channel 3 State [rw]
+    PWM_STA_STA2_FLAG  = (1u << 10u), // Channel 2 State [rw]
+    PWM_STA_STA1_FLAG  = (1u << 9u),  // Channel 1 State [rw]
+    PWM_STA_BERR_FLAG  = (1u << 8u),  // Bus Error Flag [rw]
+    PWM_STA_GAPO4_FLAG = (1u << 7u),  // Channel 4 Gap Occurred Flag [rw]
+    PWM_STA_GAPO3_FLAG = (1u << 6u),  // Channel 3 Gap Occurred Flag [rw]
+    PWM_STA_GAPO2_FLAG = (1u << 5u),  // Channel 2 Gap Occurred Flag [rw]
+    PWM_STA_GAPO1_FLAG = (1u << 4u),  // Channel 1 Gap Occurred Flag [rw]
+    PWM_STA_RERR1_FLAG = (1u << 3u),  // Fifo Read Error Flag [rw]
+    PWM_STA_WERR1_FLAG = (1u << 2u),  // Fifo Write Error Flag [rw]
+    PWM_STA_EMPT1_FLAG = (1u << 1u),  // Fifo Empty Flag [rw]
+    PWM_STA_FULL1_FLAG = (1u << 0u),  // Fifo Full Flag [rw]
+} PWM_STA_Flags_enum;
 
-// PWM Status Register Masks
-#define PWM_STA_STA4         0x00001000u                          // Channel 4 State
-#define PWM_STA_STA3         0x00000800u                          // Channel 3 State
-#define PWM_STA_STA2         0x00000400u                          // Channel 2 State
-#define PWM_STA_STA1         0x00000200u                          // Channel 1 State
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE CONSTANTS
+--|----------------------------------------------------------------------------|
+*/
 
-#define PWM_STA_BERR         0x00000100u                          // Bus Error Flag
+/* None */
 
-#define PWM_STA_GAPO4        0x00000080u                          // Channel 4 Gap Occurred Flag
-#define PWM_STA_GAPO3        0x00000040u                          // Channel 3 Gap Occurred Flag
-#define PWM_STA_GAPO2        0x00000020u                          // Channel 2 Gap Occurred Flag
-#define PWM_STA_GAPO1        0x00000010u                          // Channel 1 Gap Occurred Flag
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE VARIABLES
+--|----------------------------------------------------------------------------|
+*/
 
-#define PWM_STA_RERR1        0x00000008u                          // Fifo Read Error Flag
-#define PWM_STA_WERR1        0x00000004u                          // Fifo Write Error Flag
+/* None */
 
-#define PWM_STA_EMPT1        0x00000002u                          // Fifo Empty Flag
-#define PWM_STA_FULL1        0x00000001u                          // Fifo Full Flag
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION PROTOTYPES
+--|----------------------------------------------------------------------------|
+*/
 
-// PWM Clock Control Register Addresses
-#define CM_BASE_ADDRESS      (0x3F1010A0u)
-#define PSP_CM_PWMCTL_A      (CM_BASE_ADDRESS | 0x00000000u)      // PWM clock control register address
-#define PSP_CM_PWMDIV_A      (CM_BASE_ADDRESS | 0x00000004u)      // PWM clock divider register address
+/* None */
 
-// PWM Clock Control Register Pointers
-#define PSP_CM_PWMCTL_R      (*((vuint32_t *)PSP_CM_PWMCTL_A))    // PWM clock control register
-#define PSP_CM_PWMDIV_R      (*((vuint32_t *)PSP_CM_PWMDIV_A))    // PWM clock divider register
-
-// CM PWMCTL register masks
-#define CM_PWMCTL_PASSWD     0x5A000000u                          // PWM clock password
-#define CM_PWMCTL_ENAB       0x00000010u                          // CM PWMCLT enable
-#define CM_PWMCTL_BUSY       0x00000080u                          // CM PWMCTL Busy flag
-#define CM_PWMCTL_USE_OSC    0x00000001u                          // CM PWMCTL use internal oscillator
-
-#define CLOCK_RUNNING 1u
-#define CLOCK_NOT_RUNNING 0u
-
-/*------------------------------------------------------------------------------------------------
-    PSP_PWM Function Definitions
- -------------------------------------------------------------------------------------------------*/
-
+/*
+--|----------------------------------------------------------------------------|
+--| PUBLIC FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
 
 void PSP_PWM_Clock_Init_Default(void)
 {
     PSP_PWM_Clock_Init(PWM_DEFAULT_CLOCK, PWM_DEFAULT_DIV);
 }
 
-
-
 void PSP_PWM_Clock_Init(PSP_PWM_Clock_Source_t clock_source, uint32_t divider)
 {
     // request a clock stop
-    PSP_CM_PWMCTL_R = CM_PWMCTL_PASSWD | (PSP_CM_PWMCTL_R & (~CM_PWMCTL_ENAB));
+    PWM_Clock_Manager->CTL = CLOCK_MANAGER_PASSWORD |
+                            (PWM_Clock_Manager->CTL & ~CLOCK_MANAGER_CTL_ENAB_FLAG);
 
-    while ((PSP_CM_PWMCTL_R & CM_PWMCTL_BUSY) == CLOCK_RUNNING)
+    while (PWM_Clock_Manager->CTL & CLOCK_MANAGER_CTL_BUSY_FLAG)
     {
         // wait for the clock to stop
     }
-    
-    // set the divider, left shift of 12 pushes the divider setting into the integer part of the divider register
-    PSP_CM_PWMDIV_R = CM_PWMCTL_PASSWD | (divider << 12);
+
+    // set the integer part of divider
+    PWM_Clock_Manager->DIV = CLOCK_MANAGER_PASSWORD | 
+                            (divider << CLOCK_MANAGER_DIV_DIVI_SHIFT_AMT);
 
     // set the clock source
-    PSP_CM_PWMCTL_R = CM_PWMCTL_PASSWD | clock_source;
+    PWM_Clock_Manager->CTL = CLOCK_MANAGER_PASSWORD |
+                             clock_source;
 
-    // request a clock start (datasheet says not to change the clock source and assert enable at the same time)
-    PSP_CM_PWMCTL_R = CM_PWMCTL_PASSWD | CM_PWMCTL_ENAB | clock_source;
+    // request a clock start (datasheet says not to change the clock source and 
+    // assert enable at the same time)
+    PWM_Clock_Manager->CTL = CLOCK_MANAGER_PASSWORD | 
+                             CLOCK_MANAGER_CTL_ENAB_FLAG | clock_source;
 
-    while ((PSP_CM_PWMCTL_R & CM_PWMCTL_BUSY) == CLOCK_NOT_RUNNING)
+    while (!(PWM_Clock_Manager->CTL & CLOCK_MANAGER_CTL_BUSY_FLAG))
     {
         // wait for the clock to start
     }
 }
-
-
 
 void PSP_PWM_Channel_Start(PSP_PWM_Channel_t channel, PSP_PWM_Output_Mode_t mode, PSP_PWM_Range_t range)
 {
     if (channel == PSP_PWM_Channel_1)
     {
         // shift the mode into the MSEN1 position and enable
-        PSP_PWM_CTL_R |= (mode << 7u) | PWM_CTL_PWEN1;
-        PSP_PWM_RNG1_R = range;
+        PWM->CTL |= (mode << 7u) | PWM_CTL_PWEN1_FLAG;
+        PWM->RNG1 = range;
     }
     else
     {
         // shift the mode into the MSEN2 position and enable
-        PSP_PWM_CTL_R |= (mode << 15u) | PWM_CTL_PWEN2;
-        PSP_PWM_RNG2_R = range;   
+        PWM->CTL |= (mode << 15u) | PWM_CTL_PWEN2_FLAG;
+        PWM->RNG2 = range;   
     }
 }
 
-
-
 void PSP_PWM_Ch1_Write(uint32_t value)
 {
-    PSP_PWM_DAT1_R = value;
+    PWM->DAT1 = value;
 }
-
-
 
 void PSP_PWM_Ch2_Write(uint32_t value)
 {
-    PSP_PWM_DAT2_R = value;
+    PWM->DAT2 = value;
 }
-
-
 
 void PSP_PWM_Ch1_Set_GPIO12_To_PWM_Mode(void)
 {
     PSP_GPIO_Set_Pin_Mode(12u, PSP_GPIO_PINMODE_ALT0);
 }
 
-
-
 void PSP_PWM_Ch1_Set_GPIO18_To_PWM_Mode(void)
 {
     PSP_GPIO_Set_Pin_Mode(18u, PSP_GPIO_PINMODE_ALT5);
 }
-
-
 
 void PSP_PWM_Ch2_Set_GPIO13_To_PWM_Mode(void)
 {
     PSP_GPIO_Set_Pin_Mode(13u, PSP_GPIO_PINMODE_ALT0);
 }
 
-
-
 void PSP_PWM_Ch2_Set_GPIO19_To_PWM_Mode(void)
 {
     PSP_GPIO_Set_Pin_Mode(19u, PSP_GPIO_PINMODE_ALT5); 
 }
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
+
+/* None */
