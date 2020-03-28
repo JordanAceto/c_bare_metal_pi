@@ -12,7 +12,7 @@
 --|----------------------------------------------------------------------------|
 --| REFERENCES:
 --|    https://www.raspberrypi.org/forums/viewtopic.php?t=196015
---|    https://elinux.org/BCM2835_registers#RNG (wrong processor, but seems to work)
+--|    https://elinux.org/BCM2835_registers#RNG (wrong processor, seems to work)
 --|
 --|----------------------------------------------------------------------------|
 */
@@ -99,7 +99,7 @@ Returns:
     A random uint32_t.
 
 Assumptions/Limitations:
-    None, assumes that PSP_Hardware_RNG_Init has been called.
+    Assumes that PSP_Hardware_RNG_Init has been called.
 ------------------------------------------------------------------------------*/
 uint32_t PSP_Hardware_RNG_Get_Random(void);
 
