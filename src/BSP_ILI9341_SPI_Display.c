@@ -1,14 +1,31 @@
+/*
+--|----------------------------------------------------------------------------|
+--| FILE DESCRIPTION:
+--|   BSP_ILI9341_SPI_Display.c, just a start for driving cheap SPI screens.
+--|  
+--|----------------------------------------------------------------------------|
+--| REFERENCES:
+--|   see BSP_ILI9341_SPI_Display.h
+--|
+--|----------------------------------------------------------------------------|
+*/
+
+/*
+--|----------------------------------------------------------------------------|
+--| INCLUDE FILES
+--|----------------------------------------------------------------------------|
+*/
 
 #include "BSP_ILI9341_SPI_Display.h"
-
-#include "PSP_SPI_0.h"
 #include "PSP_GPIO.h"
+#include "PSP_SPI_0.h"
 #include "PSP_Time.h"
 
-
- /*-----------------------------------------------------------------------------------------------
-    Private BSP_ILI9341_SPI_Display Defines
- -------------------------------------------------------------------------------------------------*/
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE DEFINES
+--|----------------------------------------------------------------------------|
+*/
 
 // ILI9341 command set
 #define BSP_ILI9341_NOP        0x00u // No-op command
@@ -71,60 +88,121 @@
 
 #define FIFO_SEND_LIMIT 16u
 
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE TYPES
+--|----------------------------------------------------------------------------|
+*/
 
-/*-----------------------------------------------------------------------------------------------
-    Private BSP_ILI9341_SPI_Display Variables
- -------------------------------------------------------------------------------------------------*/
+/* None */
 
-uint32_t DC_PIN;
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE CONSTANTS
+--|----------------------------------------------------------------------------|
+*/
 
+/* None */
 
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE VARIABLES
+--|----------------------------------------------------------------------------|
+*/
 
-/*-----------------------------------------------------------------------------------------------
-    Private BSP_ILI9341_SPI_Display Functions
- -------------------------------------------------------------------------------------------------*/
+static uint32_t DC_PIN;
 
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION PROTOTYPES
+--|----------------------------------------------------------------------------|
+*/
 
-void ILI9341_Write_Command(uint8_t command)
-{
-    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
-    PSP_SPI0_Transfer_Byte(command);
-    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
-}
+/*------------------------------------------------------------------------------
+Function Name:
+    ILI9341_Write_Command
 
-void ILI9341_Send_Command(uint8_t command)
-{
-    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
-    PSP_SPI0_Send_Byte(command);
-    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
-}
+Function Description:
+    Write a command to the display. 
 
-void BSP_ILI9341_Send_Address(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
-{
-    // column set
-    ILI9341_Send_Command(BSP_ILI9341_CASET);
-    PSP_SPI0_Send_16(x0);
-    PSP_SPI0_Send_16(x1);
-
-    // row set
-    ILI9341_Send_Command(BSP_ILI9341_PASET);
-    PSP_SPI0_Send_16(y0);
-    PSP_SPI0_Send_16(y1);
+Parameters:
+    command: the command to write
     
-    // write to RAM
-    ILI9341_Send_Command(BSP_ILI9341_RAMWR);
-}
+Returns:
+    None
 
-void BSP_ILI9341_Send_Pixel_Data(uint16_t x, uint16_t y, uint16_t color)
-{
-    BSP_ILI9341_Send_Address(x, y, x, y);
-    PSP_SPI0_Send_16(color);
-}
+Assumptions/Limitations:
+    SPI write commands are standalone one shot writes that are not part of a
+    longer transfer. 
+------------------------------------------------------------------------------*/
+void ILI9341_Write_Command(uint8_t command);
 
-/*-----------------------------------------------------------------------------------------------
-    BSP_ILI9341_SPI_Display Function Definitions
- -------------------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------
+Function Name:
+    ILI9341_Send_Command
 
+Function Description:
+    Send a command to the display. 
+
+Parameters:
+    command: the command to send
+    
+Returns:
+    None
+
+Assumptions/Limitations:
+    SPI send commands are part of a larger transfer, and it is assumed that
+    this will be sandwiched between calls to PSP_SPI0_Begin_Transfer and 
+    PSP_SPI0_End_Transfer.
+------------------------------------------------------------------------------*/
+void ILI9341_Send_Command(uint8_t command);
+
+/*------------------------------------------------------------------------------
+Function Name:
+    BSP_ILI9341_Send_Address
+
+Function Description:
+    Send the coordinates of a window address to the display. 
+
+Parameters:
+    x0, y0, x1, y1: the coordinates of the rectangular window.
+    
+Returns:
+    None
+
+Assumptions/Limitations:
+    SPI send commands are part of a larger transfer, and it is assumed that
+    this will be sandwiched between calls to PSP_SPI0_Begin_Transfer and 
+    PSP_SPI0_End_Transfer.
+------------------------------------------------------------------------------*/
+void BSP_ILI9341_Send_Address(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+
+/*------------------------------------------------------------------------------
+Function Name:
+    BSP_ILI9341_Send_Pixel_Data
+
+Function Description:
+    Send the data for a single pixel. 
+
+Parameters:
+    x, y: the coordinates of the pixel.
+    color: the color of the pixel.
+
+Returns:
+    None
+
+Assumptions/Limitations:
+    SPI send commands are part of a larger transfer, and it is assumed that
+    this will be sandwiched between calls to PSP_SPI0_Begin_Transfer and 
+    PSP_SPI0_End_Transfer.
+------------------------------------------------------------------------------*/
+void BSP_ILI9341_Send_Pixel_Data(uint16_t x, uint16_t y, uint16_t color);
+
+/*
+--|----------------------------------------------------------------------------|
+--| PUBLIC FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
 
 // note: init function is in a messy and silly state, just for testing currently
 void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num)
@@ -259,16 +337,12 @@ void BSP_ILI9341_SPI_Display_Init(uint32_t dc_pin_num)
     ILI9341_Write_Command(BSP_ILI9341_NORON);
 }
 
-
-
 void BSP_ILI9341_Set_Window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
     PSP_SPI0_Begin_Transfer();
     BSP_ILI9341_Send_Address(x0, y0, x1, y1);
     PSP_SPI0_End_Transfer();
 }
-
-
 
 void BSP_ILI9341_Draw_Pixel(uint32_t x, uint32_t y, uint16_t color)
 {
@@ -277,9 +351,10 @@ void BSP_ILI9341_Draw_Pixel(uint32_t x, uint32_t y, uint16_t color)
     PSP_SPI0_End_Transfer();
 }
 
-
-
-void BSP_ILI9341_Draw_Horizontal_Line(uint32_t x, uint32_t y, uint32_t length, uint16_t color)
+void BSP_ILI9341_Draw_Horizontal_Line(uint32_t x, 
+                                      uint32_t y, 
+                                      uint32_t length, 
+                                      uint16_t color)
 {
     PSP_SPI0_Begin_Transfer();
 
@@ -300,9 +375,10 @@ void BSP_ILI9341_Draw_Horizontal_Line(uint32_t x, uint32_t y, uint32_t length, u
     PSP_SPI0_End_Transfer();
 }
 
-
-
-void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uint16_t color)
+void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, 
+                                    uint32_t y, 
+                                    uint32_t height, 
+                                    uint16_t color)
 {
     PSP_SPI0_Begin_Transfer();
 
@@ -323,9 +399,11 @@ void BSP_ILI9341_Draw_Vertical_Line(uint32_t x, uint32_t y, uint32_t height, uin
     PSP_SPI0_End_Transfer();
 }
 
-
-
-void BSP_ILI9341_Draw_Filled_Rectangle(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
+void BSP_ILI9341_Draw_Filled_Rectangle(uint32_t x, 
+                                       uint32_t y, 
+                                       uint32_t width, 
+                                       uint32_t height, 
+                                       uint16_t color)
 {
     PSP_SPI0_Begin_Transfer();
 
@@ -348,9 +426,11 @@ void BSP_ILI9341_Draw_Filled_Rectangle(uint32_t x, uint32_t y, uint32_t width, u
     PSP_SPI0_End_Transfer();
 }
 
-
-
-void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
+void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, 
+                                        uint32_t y, 
+                                        uint32_t width, 
+                                        uint32_t height, 
+                                        uint16_t color)
 {
     BSP_ILI9341_Draw_Horizontal_Line(x, y, width, color);
     BSP_ILI9341_Draw_Horizontal_Line(x, y + height - 1u, width, color);
@@ -359,9 +439,10 @@ void BSP_ILI9341_Draw_Rectangle_Outline(uint32_t x, uint32_t y, uint32_t width, 
     BSP_ILI9341_Draw_Vertical_Line(x + width - 1u, y, height, color);
 }
 
-
-
-void BSP_ILI9341_Draw_Circle_Outline(uint32_t x, uint32_t y, uint32_t r, uint16_t color)
+void BSP_ILI9341_Draw_Circle_Outline(uint32_t x, 
+                                     uint32_t y, 
+                                     uint32_t r, 
+                                     uint16_t color)
 {
     int16_t f = 1 - r;
     int16_t ddF_x = 1;
@@ -396,4 +477,46 @@ void BSP_ILI9341_Draw_Circle_Outline(uint32_t x, uint32_t y, uint32_t r, uint16_
         BSP_ILI9341_Draw_Pixel(x + y_, y - x_, color);
         BSP_ILI9341_Draw_Pixel(x - y_, y - x_, color);
     }
+}
+
+/*
+--|----------------------------------------------------------------------------|
+--| PRIVATE HELPER FUNCTION DEFINITIONS
+--|----------------------------------------------------------------------------|
+*/
+
+void ILI9341_Write_Command(uint8_t command)
+{
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
+    PSP_SPI0_Transfer_Byte(command);
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
+}
+
+void ILI9341_Send_Command(uint8_t command)
+{
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_COMMAND);
+    PSP_SPI0_Send_Byte(command);
+    PSP_GPIO_Write_Pin(DC_PIN, ILI9341_DC_PIN_WRITE_DATA);
+}
+
+void BSP_ILI9341_Send_Address(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
+    // column set
+    ILI9341_Send_Command(BSP_ILI9341_CASET);
+    PSP_SPI0_Send_16(x0);
+    PSP_SPI0_Send_16(x1);
+
+    // row set
+    ILI9341_Send_Command(BSP_ILI9341_PASET);
+    PSP_SPI0_Send_16(y0);
+    PSP_SPI0_Send_16(y1);
+    
+    // write to RAM
+    ILI9341_Send_Command(BSP_ILI9341_RAMWR);
+}
+
+void BSP_ILI9341_Send_Pixel_Data(uint16_t x, uint16_t y, uint16_t color)
+{
+    BSP_ILI9341_Send_Address(x, y, x, y);
+    PSP_SPI0_Send_16(color);
 }
