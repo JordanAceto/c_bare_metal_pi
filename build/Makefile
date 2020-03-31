@@ -1,41 +1,95 @@
+# to build a target from the examples directory: $ make demo TARGET=[name of example file]
+DEFAULT_TARGET = simple_blink
+TARGET = $(DEFAULT_TARGET)
 
-ARMGNU ?= arm-none-eabi
+DEBUG = 0
 
-ROOT_DIR  = ../
+OPTIMIZATION = -O0
 
-API_DIR = $(ROOT_DIR)include/
-SRC_DIR = $(ROOT_DIR)src/
-BIN_DIR = $(ROOT_DIR)bin/
+LD_SCRIPT = linker.ld
 
-CFLAGS = -Wall -O2 -I$(API_DIR) -ffreestanding -nostdinc -nostartfiles
+TOOLCHAIN   = arm-none-eabi
+COMPILER    = $(TOOLCHAIN)-gcc
+LINKER      = $(TOOLCHAIN)-ld
+OBJECT_COPY = $(TOOLCHAIN)-objcopy
+OBJECT_DUMP = $(TOOLCHAIN)-objdump
+OBJECT_SIZE = $(TOOLCHAIN)-size
 
-TARGET = $(ROOT_DIR)kernel.img
+ASM_FLAGS += -c
+ASM_FLAGS += -x 
+ASM_FLAGS += assembler-with-cpp
+ASM_FLAGS += $(OPTIMIZATION)
+ASM_FLAGS += $(CPU)
+ASM_FLAGS += -Wall
 
-LINKER = linker.ld
+C_FLAGS += -c
+C_FLAGS += $(CPU)
+C_FLAGS += -Wall
+C_FLAGS += $(OPTIMIZATION)
+ifeq ($(DEBUG), 1)
+C_FLAGS += -g -gdwarf-2
+endif
+C_FLAGS += -I$(INCLUDE_DIR)
+C_FLAGS += -ffreestanding 
+C_FLAGS += -nostdinc 
+C_FLAGS += -nostartfiles
 
+L_FLAGS += $(CPU)
+L_FLAGS += -Wall
+L_FLAGS += -nostartfiles
+L_FLAGS += -lgcc
+L_FLAGS += -T./$(LD_SCRIPT)
+
+OBJ_COPY_FLAGS += -S
+OBJ_COPY_FLAGS += -O 
+OBJ_COPY_FLAGS += binary
+
+ROOT_DIR     = ../
+SRC_DIR      = $(ROOT_DIR)src/
+INCLUDE_DIR  = $(ROOT_DIR)include/
+EXAMPLES_DIR = $(ROOT_DIR)examples/
+BIN_DIR      = $(ROOT_DIR)bin/
+
+IMAGE = $(ROOT_DIR)kernel.img
 ELF = $(BIN_DIR)kernel.elf
 
-C_OBJS := $(patsubst $(SRC_DIR)%.c,$(BIN_DIR)%.o,$(wildcard $(SRC_DIR)*.c))
+C_OBJECT_FILES := $(patsubst $(SRC_DIR)%.c,$(BIN_DIR)%.o,$(wildcard $(SRC_DIR)*.c))
+ASM_OBJECT_FILES := $(patsubst $(SRC_DIR)%.s,$(BIN_DIR)%.o,$(wildcard $(SRC_DIR)*.s))
 
-ASM_START = $(SRC_DIR)start.s
-ASM_START_OBJ = $(BIN_DIR)start.o
+# all makes the default demo application
+.PHONY: all
+all: demo
 
-all: $(TARGET)
+# compile the demo target, then build the rest as normal
+.PHONY: demo
+demo: $(C_OBJECT_FILES) $(BIN_DIR)
+	$(COMPILER) $(C_FLAGS) $(EXAMPLES_DIR)$(TARGET).c -o $(BIN_DIR)$(TARGET).o
+	make $(IMAGE)
 
-$(ASM_START_OBJ): $(ASM_START) $(BIN_DIR)
-	$(ARMGNU)-gcc $(CFLAGS) -c $(ASM_START) -o $(ASM_START_OBJ)
-
+# compile the user provided application c source files
 $(BIN_DIR)%.o: $(SRC_DIR)%.c
-	$(ARMGNU)-gcc $(CFLAGS) -c $< -o $@
+	$(COMPILER) $(C_FLAGS) $< -o $@
 
-$(TARGET): $(ASM_START_OBJ) $(C_OBJS)
-	$(ARMGNU)-ld -nostartfiles $(ASM_START_OBJ) $(C_OBJS) -T $(LINKER) -o $(ELF)
-	$(ARMGNU)-objcopy -O binary $(ELF) $(TARGET)
+# compile the user provided application assembly source files
+$(BIN_DIR)%.o: $(SRC_DIR)%.s
+	$(COMPILER) $(ASM_FLAGS) $< -o $@
 
+# link the object files together into the ELF file
+$(ELF): $(ASM_OBJECT_FILES) $(C_OBJECT_FILES) $(BIN_DIR)$(TARGET).o
+	$(COMPILER) $^ $(L_FLAGS) -o $@
+
+# make the kernel.img image, as well as a listing and print info about the size
+$(IMAGE): $(ELF)
+	$(OBJECT_COPY) $(OBJ_COPY_FLAGS) $< $@
+	$(OBJECT_DUMP) -D $(ELF) > $(BIN_DIR)asm_dump.list
+	$(OBJECT_SIZE) $<
+
+# create the bin dir if it does not exist
 $(BIN_DIR):
 	mkdir $@
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(IMAGE)
 	rm -f $(BIN_DIR)*.o
 	rm -f $(BIN_DIR)*.elf
+	rm -f $(BIN_DIR)*.list
