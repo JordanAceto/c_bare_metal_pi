@@ -11,8 +11,9 @@
 --|   basic periodic timers and do basic GPIO pin writing.
 --|  
 --|----------------------------------------------------------------------------|
---| REFERENCES:
---|   None.
+--| HARDWARE SETUP:
+--|   None. The pi3b+ has an onboard LED on GPIO pin 17. If you want to attach
+--|   an LED to a different pin, just change the LED_PIN_NUMBER.
 --|
 --|----------------------------------------------------------------------------|
 */
@@ -74,7 +75,6 @@
 --| TYPE: PSP_Time_Periodic_Timer_t
 */
 PSP_Time_Periodic_Timer_t periodic_timer;
-
 
 /*
 --|----------------------------------------------------------------------------|
