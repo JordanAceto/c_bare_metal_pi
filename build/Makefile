@@ -3,7 +3,7 @@ ARMGNU ?= arm-none-eabi
 
 ROOT_DIR  = ../
 
-API_DIR = $(ROOT_DIR)api/
+API_DIR = $(ROOT_DIR)include/
 SRC_DIR = $(ROOT_DIR)src/
 BIN_DIR = $(ROOT_DIR)bin/
 

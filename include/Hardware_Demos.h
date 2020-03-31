@@ -41,7 +41,7 @@ void demo_GPIO()
 {
     const uint32_t LED_PIN  = 17u;
     const uint32_t SWITCH_PIN = 21u;
-    const uint32_t DELAY_TIME_uSec = 10000u;
+    const uint32_t DELAY_TIME_uSec = 1000000u;
 
     PSP_GPIO_Set_Pin_Mode(LED_PIN, PSP_GPIO_PINMODE_OUTPUT);
     PSP_GPIO_Set_Pin_Mode(SWITCH_PIN, PSP_GPIO_PINMODE_INPUT);
