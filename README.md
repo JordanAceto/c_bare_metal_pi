@@ -4,8 +4,6 @@
 
 ### It is hoped that accessing the peripherals in C will aid in understanding and debugging the assembly code.
 
-### As peripheral modules are added, I'll add simple demos to the Hardware_Demos.h file. Then, in main.c, uncomment exactly one of the peripheral demo functions before compiling.
-
 ### How to use this repo:
 
 1. Clone a local copy on your machine.
@@ -19,7 +17,7 @@
 ### *Note:
 - The makefile allows you to choose a target demo application from the command line.
 - Look through the /examples/ directory and select an example to demo.
-- To build the exampl: **$ make demo TARGET=[name of the example application without the extension]**
+- To build the example: **$ make demo TARGET=[name of the example application without the extension]**
 - For example, to make the "simple_blink" demo: **$ make demo TARGET=simple_blink**
 - If you don't select an example, it will choose the default example for you (which is simple_blink right now)
 
